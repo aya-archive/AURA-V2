@@ -729,50 +729,55 @@ with gr.Blocks(
     /* Clean Markdown Styling */
     .gr-markdown {
         line-height: 1.6;
-        color: #4D386A;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 16px;
-        border-radius: 8px;
-        border: 1px solid rgba(122, 107, 154, 0.2);
-        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.05);
+        color: #2C263F;
+        background: #F5F5F5;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #E0E0E0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin: 16px 0;
     }
     
     /* Enhanced Markdown Text Styling */
     .gr-markdown h1, .gr-markdown h2, .gr-markdown h3, 
     .gr-markdown h4, .gr-markdown h5, .gr-markdown h6 {
-        color: #2C263F;
-        font-weight: 600;
-        margin: 16px 0 8px 0;
+        color: #1A1A1A;
+        font-weight: 700;
+        margin: 20px 0 12px 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .gr-markdown p {
-        color: #4D386A;
-        margin: 8px 0;
-        font-size: 14px;
-        line-height: 1.6;
+        color: #2C2C2C;
+        margin: 12px 0;
+        font-size: 15px;
+        line-height: 1.7;
+        font-weight: 400;
     }
     
     .gr-markdown ul, .gr-markdown ol {
-        color: #4D386A;
-        margin: 8px 0;
-        padding-left: 20px;
+        color: #2C2C2C;
+        margin: 12px 0;
+        padding-left: 24px;
     }
     
     .gr-markdown li {
-        color: #4D386A;
-        margin: 4px 0;
-        font-size: 14px;
-        line-height: 1.5;
+        color: #2C2C2C;
+        margin: 6px 0;
+        font-size: 15px;
+        line-height: 1.6;
+        font-weight: 400;
     }
     
     .gr-markdown strong, .gr-markdown b {
-        color: #2C263F;
-        font-weight: 600;
+        color: #1A1A1A;
+        font-weight: 700;
     }
     
     .gr-markdown em, .gr-markdown i {
-        color: #5A8A5A;
+        color: #4A4A4A;
         font-style: italic;
+        font-weight: 500;
     }
     
     /* Clean Row Spacing */
