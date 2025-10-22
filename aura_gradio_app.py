@@ -1184,7 +1184,7 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(scale=1):
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
-                with gr.Column(scale=3):
+                with gr.Column(scale=1):
                     csv_upload = gr.File(
                         label="📤 Upload CSV Files",
                         file_types=[".csv"],
