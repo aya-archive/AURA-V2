@@ -666,7 +666,7 @@ with gr.Blocks(
         ),
     css="""
     .gradio-container {
-        background: linear-gradient(135deg, #F9F9F9 0%, #A7A7A7 30%, #646464 70%, #333333 100%);
+        background: #F5F5F5;
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
         padding: 20px;
