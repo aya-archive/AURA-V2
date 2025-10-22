@@ -647,7 +647,7 @@ with gr.Blocks(
     
     /* Typography Improvements */
     h1, h2, h3, h4, h5, h6 {
-        color: #333333;
+        color: #8B5CF6;
         font-weight: 600;
         margin: 0 0 16px 0;
         line-height: 1.3;
@@ -701,7 +701,7 @@ with gr.Blocks(
         background: rgba(255, 255, 255, 0.95);
         padding: 12px;
         font-size: 14px;
-        color: #333333;
+        color: #8B5CF6;
         transition: all 0.2s ease;
     }
     
@@ -764,7 +764,7 @@ with gr.Blocks(
     /* Clean Markdown Styling */
     .gr-markdown {
         line-height: 1.6;
-        color: #333333;
+        color: #8B5CF6;
         background: #F5F5F5;
         padding: 20px;
         border-radius: 12px;
@@ -783,7 +783,7 @@ with gr.Blocks(
     }
     
     .gr-markdown p {
-        color: #333333;
+        color: #8B5CF6;
         margin: 12px 0;
         font-size: 15px;
         line-height: 1.7;
@@ -791,13 +791,13 @@ with gr.Blocks(
     }
     
     .gr-markdown ul, .gr-markdown ol {
-        color: #333333;
+        color: #8B5CF6;
         margin: 12px 0;
         padding-left: 24px;
     }
     
     .gr-markdown li {
-        color: #333333;
+        color: #8B5CF6;
         margin: 6px 0;
         font-size: 15px;
         line-height: 1.6;
