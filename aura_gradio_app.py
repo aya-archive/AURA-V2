@@ -653,18 +653,20 @@ with gr.Blocks(
     
     /* Clean Form Elements */
     .gr-textbox, .gr-dropdown, .gr-slider {
-        border: 1px solid rgba(122, 107, 154, 0.2);
+        border: 2px solid rgba(122, 107, 154, 0.4);
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         padding: 12px;
         font-size: 14px;
+        color: #4D386A;
         transition: all 0.2s ease;
     }
     
     .gr-textbox:focus, .gr-dropdown:focus {
         border-color: #5A8A5A;
-        box-shadow: 0 0 0 2px rgba(90, 138, 90, 0.15);
+        box-shadow: 0 0 0 3px rgba(90, 138, 90, 0.2);
         outline: none;
+        background: rgba(255, 255, 255, 1);
     }
     
     /* Clean Data Display */
@@ -700,16 +702,19 @@ with gr.Blocks(
     /* Clean File Upload */
     .gr-file {
         border-radius: 8px;
-        border: 2px dashed rgba(122, 107, 154, 0.3);
-        background: rgba(255, 255, 255, 0.8);
+        border: 2px dashed rgba(122, 107, 154, 0.5);
+        background: rgba(255, 255, 255, 0.95);
         padding: 20px;
         text-align: center;
         transition: all 0.2s ease;
+        color: #4D386A;
+        font-weight: 500;
     }
     
     .gr-file:hover {
         border-color: #5A8A5A;
-        background: rgba(90, 138, 90, 0.05);
+        background: rgba(90, 138, 90, 0.08);
+        color: #5A8A5A;
     }
     
     /* Clean Markdown Styling */
@@ -765,47 +770,13 @@ with gr.Blocks(
             # CSV Upload section
             gr.Markdown("### 📁 Upload Your Own Data")
             with gr.Row():
-                with gr.Column(scale=2):
-                    csv_upload = gr.File(
-                        label="📤 Upload CSV File",
-                        file_types=[".csv"],
-                        file_count="single"
-                    )
-                with gr.Column(scale=1):
-                    upload_btn = gr.Button("📤 Process CSV Data", variant="primary", size="lg")
-            
-            # CSV format guidance
-            gr.Markdown("""
-            **📋 CSV Format Requirements:**
-            
-            **Required Columns:**
-            - `customer_id` (or `id`) - Unique customer identifier
-            - `name` (or `customer_name`) - Customer name
-            
-            **Recommended Columns:**
-            - `email` - Customer email address
-            - `subscription_plan` (or `plan`) - Subscription tier
-            - `revenue` (or `total_revenue`) - Customer revenue
-            - `engagement_score` - Customer engagement level (0-1)
-            - `health_score` - Customer health score (0-100)
-            - `churn_risk_level` - Risk level (Low/Medium/High)
-            - `segment` - Customer segment
-            
-            **💡 Tips:**
-            - Missing recommended columns will be filled with realistic defaults
-            - Data will be automatically cleaned and standardized
-            - Supports various column name formats (e.g., 'id' → 'customer_id')
-            """)
-            
-            # Sample CSV download
-            with gr.Row():
-                gr.Markdown("**📥 Need a template?** Download our sample CSV file:")
-                sample_csv = gr.File(
-                    label="Download Sample CSV",
-                    value="sample_customer_data.csv",
-                    visible=True,
-                    interactive=False
+                csv_upload = gr.File(
+                    label="📤 Upload CSV File",
+                    file_types=[".csv"],
+                    file_count="single"
                 )
+                upload_btn = gr.Button("📤 Process CSV Data", variant="primary", size="lg")
+            
             
             load_btn.click(
                 load_aura_data,
@@ -850,8 +821,7 @@ with gr.Blocks(
             customer_table = gr.Dataframe(
                 label="📋 Customer Data Table",
                 interactive=False,
-                wrap=True,
-                height=400
+                wrap=True
             )
             
             # Update dashboard when data is loaded
