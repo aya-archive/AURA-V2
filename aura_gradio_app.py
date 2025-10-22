@@ -1179,17 +1179,22 @@ with gr.Blocks(
         with gr.Tab("📊 Dashboard"):
             gr.Markdown("## 📊 Executive Dashboard")
             
-            # Data loading and upload section - All in one row (Status, Upload, Process, Pipeline)
+            # Data loading and upload section - 2 rows layout
             gr.Markdown("### 📁 Upload Your Data Files")
+            
+            # First row: Upload and Status
             with gr.Row():
-                with gr.Column(scale=1):
-                    status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
                 with gr.Column(scale=1):
                     csv_upload = gr.File(
                         label="📤 Upload CSV Files",
                         file_types=[".csv"],
                         file_count="multiple"
                     )
+                with gr.Column(scale=1):
+                    status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
+            
+            # Second row: Process and Pipeline
+            with gr.Row():
                 with gr.Column(scale=1):
                     upload_btn = gr.Button("📤 Process", variant="primary", size="sm")
                 with gr.Column(scale=1):
