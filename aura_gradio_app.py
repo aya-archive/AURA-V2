@@ -429,41 +429,77 @@ def chat_with_aura(message, history):
 with gr.Blocks(
     title="A.U.R.A - Adaptive User Retention Assistant",
     theme=gr.themes.Soft(
-        primary_hue=gr.themes.Color(c50="#e0eff7", c100="#c2e0f0", c200="#a3d0e9", c300="#85c1e2", c400="#66b1db", c500="#47a2d4", c600="#3a82a9", c700="#2d627e", c800="#204253", c900="#132228", c950="#0a1114"),
-        secondary_hue=gr.themes.Color(c50="#e0f7f7", c100="#c2f0f0", c200="#a3e9e9", c300="#85e2e2", c400="#66dbdb", c500="#47d4d4", c600="#3aabab", c700="#2d8282", c800="#205353", c900="#132828", c950="#0a1414"),
-        neutral_hue=gr.themes.Color(c50="#f8f8f8", c100="#f0f0f0", c200="#e9e9e9", c300="#e2e2e2", c400="#dbdbdb", c500="#d4d4d4", c600="#ababab", c700="#828282", c800="#535353", c900="#282828", c950="#141414"),
+        primary_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#DE8650", c300="#DE8650", c400="#DE8650", c500="#1C213F", c600="#1C213F", c700="#1C213F", c800="#1C213F", c900="#1C213F", c950="#1C213F"),
+        secondary_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#BB8F82", c300="#BB8F82", c400="#BB8F82", c500="#EE341C", c600="#EE341C", c700="#EE341C", c800="#EE341C", c900="#EE341C", c950="#EE341C"),
+        neutral_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#BB8F82", c300="#BB8F82", c400="#BB8F82", c500="#1C213F", c600="#1C213F", c700="#1C213F", c800="#1C213F", c900="#1C213F", c950="#1C213F"),
     ),
     css="""
     .gradio-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1C213F 0%, #DE8650 50%, #F9F3EF 100%);
         font-family: 'Inter', sans-serif;
+        min-height: 100vh;
     }
     .gr-panel {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(249, 243, 239, 0.95);
         border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 20px 40px rgba(28, 33, 63, 0.15);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(187, 143, 130, 0.3);
     }
     h1, h2, h3, h4, h5, h6 {
-        color: #004D7A;
+        color: #1C213F;
         font-weight: 700;
+        text-shadow: 0 2px 4px rgba(28, 33, 63, 0.1);
     }
     .gr-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #1C213F 0%, #DE8650 100%);
+        color: #F9F3EF;
         border-radius: 12px;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(28, 33, 63, 0.3);
+        border: none;
     }
     .gr-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 8px 25px rgba(28, 33, 63, 0.4);
+        background: linear-gradient(135deg, #DE8650 0%, #EE341C 100%);
     }
     .gr-tab-button.selected {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #1C213F 0%, #DE8650 100%);
+        color: #F9F3EF;
+        border-radius: 8px;
+    }
+    .gr-tab-button {
+        color: #1C213F;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .gr-tab-button:hover {
+        background: rgba(222, 134, 80, 0.1);
+        color: #DE8650;
+    }
+    .gr-textbox, .gr-dropdown, .gr-slider {
+        border: 2px solid rgba(187, 143, 130, 0.3);
+        border-radius: 8px;
+        background: rgba(249, 243, 239, 0.8);
+    }
+    .gr-textbox:focus, .gr-dropdown:focus {
+        border-color: #DE8650;
+        box-shadow: 0 0 0 3px rgba(222, 134, 80, 0.1);
+    }
+    .gr-plot {
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(28, 33, 63, 0.1);
+    }
+    .gr-dataframe {
+        border-radius: 12px;
+        border: 1px solid rgba(187, 143, 130, 0.3);
+    }
+    .gr-chatbot {
+        border-radius: 12px;
+        border: 1px solid rgba(187, 143, 130, 0.3);
+        background: rgba(249, 243, 239, 0.8);
     }
     """
 ) as app:
