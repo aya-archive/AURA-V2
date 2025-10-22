@@ -621,14 +621,14 @@ def chat_with_aura(message, history):
 # Create the Gradio interface
 with gr.Blocks(
     title="A.U.R.A - Adaptive User Retention Assistant",
-    theme=gr.themes.Soft(
-        primary_hue=gr.themes.Color(c50="#FDF4E3", c100="#FBF0D9", c200="#F8E6C7", c300="#F5DCB5", c400="#F2D2A3", c500="#7A6B9A", c600="#6B5A8A", c700="#5C497A", c800="#4D386A", c900="#3E275A", c950="#2F164A"),
-        secondary_hue=gr.themes.Color(c50="#E8F5E8", c100="#D1EBD1", c200="#BAE1BA", c300="#A3D7A3", c400="#8CCD8C", c500="#5A8A5A", c600="#4D7A4D", c700="#406A40", c800="#335A33", c900="#264A26", c950="#193A19"),
-        neutral_hue=gr.themes.Color(c50="#FDF4E3", c100="#F8E6C7", c200="#F2D2A3", c300="#E6BE7F", c400="#DAAA5B", c500="#7A6B9A", c600="#6B5A8A", c700="#5C497A", c800="#4D386A", c900="#3E275A", c950="#2F164A"),
-    ),
+        theme=gr.themes.Soft(
+            primary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#333333", c950="#000000"),
+            secondary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#333333", c950="#000000"),
+            neutral_hue=gr.themes.Color(c50="#F9F9F9", c100="#A7A7A7", c200="#A7A7A7", c300="#646464", c400="#646464", c500="#333333", c600="#333333", c700="#000000", c800="#000000", c900="#000000", c950="#000000"),
+        ),
     css="""
     .gradio-container {
-        background: linear-gradient(135deg, #FDF4E3 0%, #F8E6C7 30%, #E8F5E8 70%, #D1EBD1 100%);
+        background: linear-gradient(135deg, #F9F9F9 0%, #A7A7A7 30%, #646464 70%, #333333 100%);
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
         padding: 20px;
@@ -655,22 +655,22 @@ with gr.Blocks(
     
     /* Clean Button Design */
     .gr-button {
-        background: linear-gradient(135deg, #7A6B9A 0%, #6B5A8A 100%);
-        color: #FDF4E3;
+        background: linear-gradient(135deg, #E85002 0%, #C10801 100%);
+        color: #F9F9F9;
         border-radius: 10px;
         font-weight: 500;
         font-size: 14px;
         padding: 12px 24px;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.2);
+        box-shadow: 0 2px 8px rgba(232, 80, 2, 0.2);
         border: none;
         min-height: 44px;
     }
     
     .gr-button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(122, 107, 154, 0.3);
-        background: linear-gradient(135deg, #6B5A8A 0%, #5A8A5A 100%);
+        box-shadow: 0 4px 16px rgba(232, 80, 2, 0.3);
+        background: linear-gradient(135deg, #F16001 0%, #E85002 100%);
     }
     
     /* Clean Tab Design */
@@ -682,9 +682,9 @@ with gr.Blocks(
     }
     
     .gr-tab-button {
-        color: #8B5CF6;
-        background: rgba(139, 92, 246, 0.1);
-        border: 1px solid rgba(139, 92, 246, 0.3);
+        color: #333333;
+        background: rgba(232, 80, 2, 0.1);
+        border: 1px solid rgba(232, 80, 2, 0.3);
         border-radius: 8px;
         transition: all 0.2s ease;
         font-weight: 500;
@@ -692,14 +692,14 @@ with gr.Blocks(
     }
     
     .gr-tab-button:hover {
-        background: rgba(139, 92, 246, 0.2);
-        color: #6D28D9;
+        background: rgba(232, 80, 2, 0.2);
+        color: #E85002;
     }
     
     .gr-tab-button.selected {
-        background: rgba(139, 92, 246, 0.9);
-        color: #FFFFFF;
-        border-color: #8B5CF6;
+        background: rgba(232, 80, 2, 0.9);
+        color: #F9F9F9;
+        border-color: #E85002;
     }
     
     /* Clean Form Elements */
@@ -965,52 +965,52 @@ with gr.Blocks(
     
     /* Component-specific output text colors */
     
-    /* Dashboard Tab - Blue output text */
+    /* Dashboard Tab - Orange branding output text */
     .gr-tab[data-tab="0"] .gr-dataframe,
     .gr-tab[data-tab="0"] .gr-plot,
     .gr-tab[data-tab="0"] .gr-textbox[readonly],
     .gr-tab[data-tab="0"] .gr-chatbot {
-        color: #1E3A8A !important;
+        color: #E85002 !important;
     }
     
-    /* Customer Analysis Tab - Green output text */
+    /* Customer Analysis Tab - Dark gray output text */
     .gr-tab[data-tab="1"] .gr-dataframe,
     .gr-tab[data-tab="1"] .gr-plot,
     .gr-tab[data-tab="1"] .gr-textbox[readonly],
     .gr-tab[data-tab="1"] .gr-chatbot {
-        color: #166534 !important;
+        color: #333333 !important;
     }
     
-    /* Retention Strategies Tab - Red output text */
+    /* Retention Strategies Tab - Red gradient output text */
     .gr-tab[data-tab="2"] .gr-dataframe,
     .gr-tab[data-tab="2"] .gr-plot,
     .gr-tab[data-tab="2"] .gr-textbox[readonly],
     .gr-tab[data-tab="2"] .gr-chatbot {
-        color: #7C2D12 !important;
+        color: #C10801 !important;
     }
     
-    /* Forecasting Tab - Orange output text */
+    /* Forecasting Tab - Orange gradient output text */
     .gr-tab[data-tab="3"] .gr-dataframe,
     .gr-tab[data-tab="3"] .gr-plot,
     .gr-tab[data-tab="3"] .gr-textbox[readonly],
     .gr-tab[data-tab="3"] .gr-chatbot {
-        color: #C2410C !important;
+        color: #F16001 !important;
     }
     
-    /* Risk Analysis Tab - Red output text */
+    /* Risk Analysis Tab - Beige gradient output text */
     .gr-tab[data-tab="4"] .gr-dataframe,
     .gr-tab[data-tab="4"] .gr-plot,
     .gr-tab[data-tab="4"] .gr-textbox[readonly],
     .gr-tab[data-tab="4"] .gr-chatbot {
-        color: #991B1B !important;
+        color: #D9C3AB !important;
     }
     
-    /* AI Assistant Tab - Teal output text */
+    /* AI Assistant Tab - Light gray output text */
     .gr-tab[data-tab="5"] .gr-dataframe,
     .gr-tab[data-tab="5"] .gr-plot,
     .gr-tab[data-tab="5"] .gr-textbox[readonly],
     .gr-tab[data-tab="5"] .gr-chatbot {
-        color: #0F766E !important;
+        color: #A7A7A7 !important;
     }
     
     /* Override any light text colors */
@@ -1041,7 +1041,7 @@ with gr.Blocks(
         with gr.Tab("📊 Dashboard"):
             gr.Markdown("## 📊 Executive Dashboard")
             
-            # Data loading and upload section
+            # Data loading and upload section - All in one row
             gr.Markdown("### 📁 Upload Your Data Files")
             with gr.Row():
                 with gr.Column(scale=1):
@@ -1055,7 +1055,7 @@ with gr.Blocks(
                         file_count="multiple"
                     )
                 with gr.Column(scale=2):
-                    status_text = gr.Textbox(label="📋 Status", interactive=False, lines=2)
+                    status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
             
             
             
