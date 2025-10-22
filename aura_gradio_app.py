@@ -719,29 +719,45 @@ with gr.Blocks(
         font-size: 12px;
     }
     
-    /* Hide default file upload text */
+    /* Fix file upload button styling */
     .gr-file .gr-button {
-        display: none;
+        padding: 4px 8px !important;
+        min-height: 24px !important;
+        font-size: 10px !important;
+        border-radius: 4px !important;
+        margin: 2px !important;
     }
     
-    /* Custom file upload styling */
-    .gr-file .gr-button[data-testid="file-upload-button"] {
-        display: none;
-    }
-    
-    /* Hide drop zone text */
+    /* Hide default file upload text */
     .gr-file .gr-text {
-        display: none;
+        display: none !important;
     }
     
     /* Compact file upload area */
     .gr-file {
-        min-height: 40px;
+        min-height: 32px !important;
+        padding: 2px !important;
     }
     
-    .gr-file .gr-button {
-        min-height: 40px;
-        padding: 8px 16px;
+    /* Minimal file upload button */
+    .gr-file .gr-button[data-testid="file-upload-button"] {
+        padding: 4px 8px !important;
+        min-height: 24px !important;
+        font-size: 10px !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Hide verbose upload text */
+    .gr-file .wrap {
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+    
+    /* Minimal file upload wrapper */
+    .gr-file .wrap.default.full {
+        padding: 0px !important;
+        margin: 0px !important;
+        min-height: 24px !important;
     }
     
     /* PWA install banner */
