@@ -682,7 +682,9 @@ with gr.Blocks(
     }
     
     .gr-tab-button {
-        color: #333333;
+        color: #8B5CF6;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.3);
         border-radius: 8px;
         transition: all 0.2s ease;
         font-weight: 500;
@@ -690,8 +692,14 @@ with gr.Blocks(
     }
     
     .gr-tab-button:hover {
-        background: rgba(90, 138, 90, 0.1);
-        color: #5A8A5A;
+        background: rgba(139, 92, 246, 0.2);
+        color: #6D28D9;
+    }
+    
+    .gr-tab-button.selected {
+        background: rgba(139, 92, 246, 0.9);
+        color: #FFFFFF;
+        border-color: #8B5CF6;
     }
     
     /* Clean Form Elements */
@@ -953,6 +961,56 @@ with gr.Blocks(
     .gr-tab[data-tab="5"] .gr-markdown {
         background: linear-gradient(135deg, #F0FDFA 0%, #CCFBF1 100%);
         border: 1px solid #14B8A6;
+    }
+    
+    /* Component-specific output text colors */
+    
+    /* Dashboard Tab - Blue output text */
+    .gr-tab[data-tab="0"] .gr-dataframe,
+    .gr-tab[data-tab="0"] .gr-plot,
+    .gr-tab[data-tab="0"] .gr-textbox[readonly],
+    .gr-tab[data-tab="0"] .gr-chatbot {
+        color: #1E3A8A !important;
+    }
+    
+    /* Customer Analysis Tab - Green output text */
+    .gr-tab[data-tab="1"] .gr-dataframe,
+    .gr-tab[data-tab="1"] .gr-plot,
+    .gr-tab[data-tab="1"] .gr-textbox[readonly],
+    .gr-tab[data-tab="1"] .gr-chatbot {
+        color: #166534 !important;
+    }
+    
+    /* Retention Strategies Tab - Red output text */
+    .gr-tab[data-tab="2"] .gr-dataframe,
+    .gr-tab[data-tab="2"] .gr-plot,
+    .gr-tab[data-tab="2"] .gr-textbox[readonly],
+    .gr-tab[data-tab="2"] .gr-chatbot {
+        color: #7C2D12 !important;
+    }
+    
+    /* Forecasting Tab - Orange output text */
+    .gr-tab[data-tab="3"] .gr-dataframe,
+    .gr-tab[data-tab="3"] .gr-plot,
+    .gr-tab[data-tab="3"] .gr-textbox[readonly],
+    .gr-tab[data-tab="3"] .gr-chatbot {
+        color: #C2410C !important;
+    }
+    
+    /* Risk Analysis Tab - Red output text */
+    .gr-tab[data-tab="4"] .gr-dataframe,
+    .gr-tab[data-tab="4"] .gr-plot,
+    .gr-tab[data-tab="4"] .gr-textbox[readonly],
+    .gr-tab[data-tab="4"] .gr-chatbot {
+        color: #991B1B !important;
+    }
+    
+    /* AI Assistant Tab - Teal output text */
+    .gr-tab[data-tab="5"] .gr-dataframe,
+    .gr-tab[data-tab="5"] .gr-plot,
+    .gr-tab[data-tab="5"] .gr-textbox[readonly],
+    .gr-tab[data-tab="5"] .gr-chatbot {
+        color: #0F766E !important;
     }
     
     /* Override any light text colors */
