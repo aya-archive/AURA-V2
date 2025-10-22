@@ -613,7 +613,7 @@ with gr.Blocks(
     
     /* Typography Improvements */
     h1, h2, h3, h4, h5, h6 {
-        color: #4D386A;
+        color: #333333;
         font-weight: 600;
         margin: 0 0 16px 0;
         line-height: 1.3;
@@ -648,7 +648,7 @@ with gr.Blocks(
     }
     
     .gr-tab-button {
-        color: #4D386A;
+        color: #333333;
         border-radius: 8px;
         transition: all 0.2s ease;
         font-weight: 500;
@@ -667,7 +667,7 @@ with gr.Blocks(
         background: rgba(255, 255, 255, 0.95);
         padding: 12px;
         font-size: 14px;
-        color: #4D386A;
+        color: #333333;
         transition: all 0.2s ease;
     }
     
@@ -706,6 +706,7 @@ with gr.Blocks(
         border: 1px solid rgba(122, 107, 154, 0.2);
         font-weight: 500;
         text-align: center;
+        color: #333333;
     }
     
     /* Clean File Upload */
@@ -716,7 +717,7 @@ with gr.Blocks(
         padding: 20px;
         text-align: center;
         transition: all 0.2s ease;
-        color: #4D386A;
+        color: #333333;
         font-weight: 500;
     }
     
@@ -794,6 +795,55 @@ with gr.Blocks(
         padding: 12px;
         font-family: 'Monaco', 'Menlo', monospace;
         font-size: 13px;
+        color: #333333;
+    }
+    
+    /* Comprehensive Text Color Fixes */
+    .gr-label, .gr-textbox label, .gr-dropdown label, .gr-slider label {
+        color: #333333 !important;
+        font-weight: 500;
+    }
+    
+    .gr-textbox input, .gr-textbox textarea {
+        color: #333333 !important;
+    }
+    
+    .gr-dropdown select {
+        color: #333333 !important;
+    }
+    
+    .gr-slider .gr-label {
+        color: #333333 !important;
+    }
+    
+    .gr-plot .plotly .modebar {
+        color: #333333 !important;
+    }
+    
+    .gr-dataframe table {
+        color: #333333 !important;
+    }
+    
+    .gr-dataframe th, .gr-dataframe td {
+        color: #333333 !important;
+    }
+    
+    .gr-chatbot .message {
+        color: #333333 !important;
+    }
+    
+    /* Force all text to dark gray */
+    * {
+        color: #333333 !important;
+    }
+    
+    /* Override any light text colors */
+    .gr-button {
+        color: #FDF4E3 !important;
+    }
+    
+    .gr-tab-button.selected {
+        color: #FDF4E3 !important;
     }
     """
 ) as app:
