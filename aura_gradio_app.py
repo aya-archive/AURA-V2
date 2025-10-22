@@ -1042,22 +1042,20 @@ with gr.Blocks(
             gr.Markdown("## 📊 Executive Dashboard")
             
             # Data loading and upload section
+            gr.Markdown("### 📁 Upload Your Data Files")
             with gr.Row():
                 with gr.Column(scale=1):
                     pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="primary", size="lg")
                 with gr.Column(scale=1):
                     upload_btn = gr.Button("📤 Process All CSV Data", variant="primary", size="lg")
                 with gr.Column(scale=2):
+                    csv_upload = gr.File(
+                        label="📤 Upload CSV Files (Multiple files supported)",
+                        file_types=[".csv"],
+                        file_count="multiple"
+                    )
+                with gr.Column(scale=2):
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=2)
-            
-            # CSV Upload section
-            gr.Markdown("### 📁 Upload Your Data Files")
-            with gr.Row():
-                csv_upload = gr.File(
-                    label="📤 Upload CSV Files (Multiple files supported)",
-                    file_types=[".csv"],
-                    file_count="multiple"
-                )
             
             
             
