@@ -719,6 +719,31 @@ with gr.Blocks(
         font-size: 12px;
     }
     
+    /* Hide default file upload text */
+    .gr-file .gr-button {
+        display: none;
+    }
+    
+    /* Custom file upload styling */
+    .gr-file .gr-button[data-testid="file-upload-button"] {
+        display: none;
+    }
+    
+    /* Hide drop zone text */
+    .gr-file .gr-text {
+        display: none;
+    }
+    
+    /* Compact file upload area */
+    .gr-file {
+        min-height: 40px;
+    }
+    
+    .gr-file .gr-button {
+        min-height: 40px;
+        padding: 8px 16px;
+    }
+    
     /* PWA install banner */
     .pwa-install-banner {
         position: fixed;
@@ -1161,7 +1186,7 @@ with gr.Blocks(
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
                 with gr.Column(scale=3):
                     csv_upload = gr.File(
-                        label="📤 Upload CSV Files (Multiple files supported)",
+                        label="📤 Upload CSV Files",
                         file_types=[".csv"],
                         file_count="multiple"
                     )
