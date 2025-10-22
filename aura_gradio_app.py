@@ -729,7 +729,7 @@ with gr.Blocks(
     /* Clean Markdown Styling */
     .gr-markdown {
         line-height: 1.6;
-        color: #2C263F;
+        color: #333333;
         background: #F5F5F5;
         padding: 20px;
         border-radius: 12px;
@@ -748,7 +748,7 @@ with gr.Blocks(
     }
     
     .gr-markdown p {
-        color: #2C2C2C;
+        color: #333333;
         margin: 12px 0;
         font-size: 15px;
         line-height: 1.7;
@@ -756,13 +756,13 @@ with gr.Blocks(
     }
     
     .gr-markdown ul, .gr-markdown ol {
-        color: #2C2C2C;
+        color: #333333;
         margin: 12px 0;
         padding-left: 24px;
     }
     
     .gr-markdown li {
-        color: #2C2C2C;
+        color: #333333;
         margin: 6px 0;
         font-size: 15px;
         line-height: 1.6;
