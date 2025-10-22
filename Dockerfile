@@ -1,6 +1,6 @@
-# A.U.R.A (AI-Unified Retention Analytics) - Main Application Dockerfile
+# A.U.R.A (Adaptive User Retention Assistant) - Main Application Dockerfile
 # This Dockerfile creates a production-ready container for the A.U.R.A platform
-# It includes the complete data pipeline, AI models, and Streamlit dashboard
+# It includes the complete data pipeline, AI models, and Gradio dashboard
 
 # Use Python 3.11 slim image as base for optimal performance and security
 FROM python:3.11-slim
@@ -59,19 +59,19 @@ RUN mkdir -p data/bronze data/silver data/gold data/temp \
 # Set proper permissions for data directories
 RUN chmod -R 755 data/ models/ uploads/ logs/
 
-# Expose Streamlit port
-EXPOSE 8501
+# Expose Gradio port
+EXPOSE 7860
 
 # Health check to ensure the application is running properly
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8501/_stcore/health || exit 1
+    CMD curl -f http://localhost:7860/ || exit 1
 
-# Set default command to run the Streamlit application
-CMD ["streamlit", "run", "src/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
+# Set default command to run the Gradio application
+CMD ["python", "aura_gradio_app.py"]
 
 # Add labels for better container management
 LABEL maintainer="A.U.R.A Team" \
       version="1.0" \
-      description="AI-Unified Retention Analytics Platform" \
+      description="Adaptive User Retention Assistant Platform" \
       org.opencontainers.image.title="A.U.R.A" \
       org.opencontainers.image.description="AI-powered platform for client monitoring, churn prediction, and retention strategy optimization"

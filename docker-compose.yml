@@ -5,14 +5,14 @@
 version: '3.8'
 
 services:
-  # Main A.U.R.A Application (Streamlit Dashboard + AI Models)
+  # Main A.U.R.A Application (Gradio Dashboard + AI Models)
   aura-app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: aura-main-app
     ports:
-      - "8501:8501"  # Streamlit dashboard
+      - "7860:7860"  # Gradio dashboard
     volumes:
       # Mount data directories for persistent storage (Medallion architecture)
       - ./data:/home/aura/app/data
@@ -23,16 +23,13 @@ services:
       - ./src:/home/aura/app/src
     environment:
       - PYTHONPATH=/home/aura/app/src
-      - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
-      - STREAMLIT_SERVER_HEADLESS=true
-      - STREAMLIT_SERVER_ENABLE_CORS=false
-      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
+      - GRADIO_SERVER_PORT=7860
+      - GRADIO_SERVER_ADDRESS=0.0.0.0
     networks:
       - aura-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
       interval: 30s
       timeout: 10s
       retries: 3

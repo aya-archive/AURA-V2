@@ -91,15 +91,8 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
    ```
 
 5. **Launch the application**
-   
-   **Gradio Interface (Recommended):**
    ```bash
    python3 aura_gradio_app.py
-   ```
-   
-   **Streamlit Interface:**
-   ```bash
-   streamlit run src/dashboard/app.py
    ```
 
 ### Docker Deployment
@@ -182,7 +175,7 @@ python -m pytest --cov=src --cov-report=html
 
 ## 📈 Usage Examples
 
-### Gradio Interface (Recommended)
+### A.U.R.A Interface
 The modern Gradio interface provides 6 main tabs:
 
 #### 📊 Dashboard Tab
@@ -215,11 +208,6 @@ The modern Gradio interface provides 6 main tabs:
 - **Strategy Advice**: Get recommendations like "What strategies should I use?"
 - **Interactive Chat**: Conversational AI for data exploration and insights
 
-### Streamlit Interface (Legacy)
-1. **Load Data**: Use the sidebar to load customer data or generate sample data
-2. **Apply Filters**: Filter by risk level, customer segment, or date range
-3. **Explore Insights**: View executive summary, risk analysis, and customer details
-4. **Monitor KPIs**: Track key metrics and trends in real-time
 
 ## 🔒 Security & Privacy
 

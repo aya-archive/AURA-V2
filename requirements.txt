@@ -29,10 +29,8 @@ spacy>=3.6.0               # Advanced NLP for text preprocessing and entity reco
 nltk>=3.8.0                # Natural language toolkit for text processing
 
 # Dashboard and Web Interface
-# Streamlit and visualization libraries for the main dashboard
-streamlit>=1.25.0          # Primary web framework for A.U.R.A dashboard
-streamlit-option-menu>=0.3.0 # Enhanced navigation components
-streamlit-aggrid>=0.3.0    # Advanced data tables for client monitoring
+# Gradio and visualization libraries for the main dashboard
+gradio>=4.0.0              # Primary web framework for A.U.R.A dashboard
 plotly>=5.15.0             # Interactive visualizations for dashboard charts
 matplotlib>=3.7.0           # Static plotting for data analysis and model evaluation
 seaborn>=0.12.0            # Statistical data visualization for EDA
