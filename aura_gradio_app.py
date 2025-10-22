@@ -952,9 +952,7 @@ with gr.Blocks(
             # Data loading section
             with gr.Row():
                 with gr.Column(scale=1):
-                    load_btn = gr.Button("🔄 Load A.U.R.A Data", variant="primary", size="lg")
-                with gr.Column(scale=1):
-                    pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="secondary", size="lg")
+                    pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="primary", size="lg")
                 with gr.Column(scale=2):
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=2)
             
@@ -969,10 +967,6 @@ with gr.Blocks(
                 upload_btn = gr.Button("📤 Process CSV Data", variant="primary", size="lg")
             
             
-            load_btn.click(
-                load_aura_data,
-                outputs=[status_text]
-            )
             
             pipeline_btn.click(
                 run_data_pipeline,
@@ -1016,27 +1010,27 @@ with gr.Blocks(
             )
             
             # Update dashboard when data is loaded
-            load_btn.click(
+            pipeline_btn.click(
                 get_metrics,
                 outputs=[total_customers, high_risk, avg_health, total_revenue]
             )
             
-            load_btn.click(
+            pipeline_btn.click(
                 create_risk_distribution_chart,
                 outputs=[risk_chart]
             )
             
-            load_btn.click(
+            pipeline_btn.click(
                 create_health_score_chart,
                 outputs=[health_chart]
             )
             
-            load_btn.click(
+            pipeline_btn.click(
                 create_segment_chart,
                 outputs=[segment_chart]
             )
             
-            load_btn.click(
+            pipeline_btn.click(
                 get_customer_table,
                 outputs=[customer_table]
             )
