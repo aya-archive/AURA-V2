@@ -1,0 +1,21 @@
+customer_id,name,email,subscription_plan,total_lifetime_revenue,engagement_score,current_health_score,churn_risk_level,segment,days_since_last_engagement,total_support_tickets_lifetime
+CUST_001,John Smith,john.smith@email.com,Premium,15000,0.85,78,Low,High-Value,5,2
+CUST_002,Sarah Johnson,sarah.johnson@email.com,Standard,8500,0.72,65,Medium,Medium-Value,12,1
+CUST_003,Mike Wilson,mike.wilson@email.com,Basic,3200,0.45,42,High,SMB,28,4
+CUST_004,Emily Davis,emily.davis@email.com,Enterprise,25000,0.92,88,Low,High-Value,3,0
+CUST_005,David Brown,david.brown@email.com,Standard,7200,0.68,58,Medium,Medium-Value,18,2
+CUST_006,Lisa Garcia,lisa.garcia@email.com,Basic,2100,0.38,35,High,SMB,35,5
+CUST_007,Robert Miller,robert.miller@email.com,Premium,12000,0.79,71,Low,High-Value,8,1
+CUST_008,Jennifer Taylor,jennifer.taylor@email.com,Standard,6800,0.61,55,Medium,Medium-Value,22,3
+CUST_009,William Anderson,william.anderson@email.com,Basic,1800,0.29,28,High,SMB,42,6
+CUST_010,Amanda Thomas,amanda.thomas@email.com,Enterprise,30000,0.95,92,Low,High-Value,2,0
+CUST_011,Christopher Jackson,christopher.jackson@email.com,Premium,13500,0.81,74,Low,High-Value,6,1
+CUST_012,Jessica White,jessica.white@email.com,Standard,5900,0.54,48,Medium,Medium-Value,25,2
+CUST_013,Daniel Harris,daniel.harris@email.com,Basic,2400,0.41,38,High,SMB,31,4
+CUST_014,Michelle Martin,michelle.martin@email.com,Premium,11000,0.76,69,Low,High-Value,9,1
+CUST_015,James Thompson,james.thompson@email.com,Standard,7500,0.63,57,Medium,Medium-Value,15,2
+CUST_016,Ashley Garcia,ashley.garcia@email.com,Basic,1900,0.33,31,High,SMB,38,5
+CUST_017,Matthew Martinez,matthew.martinez@email.com,Enterprise,28000,0.89,85,Low,High-Value,4,0
+CUST_018,Samantha Robinson,samantha.robinson@email.com,Premium,14200,0.83,76,Low,High-Value,7,1
+CUST_019,Andrew Clark,andrew.clark@email.com,Standard,6100,0.57,51,Medium,Medium-Value,20,3
+CUST_020,Nicole Rodriguez,nicole.rodriguez@email.com,Basic,2200,0.36,33,High,SMB,33,4

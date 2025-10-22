@@ -71,6 +71,156 @@ def load_aura_data():
     data_loaded = True
     return "✅ Sample data generated successfully!"
 
+def upload_and_process_csv(csv_file):
+    """Upload and process CSV file through A.U.R.A pipeline."""
+    global customer_data, data_loaded
+    
+    if csv_file is None:
+        return "❌ No file uploaded. Please select a CSV file."
+    
+    try:
+        logger.info(f"Processing uploaded CSV file: {csv_file.name}")
+        
+        # Read the CSV file
+        uploaded_data = pd.read_csv(csv_file.name)
+        
+        # Validate the data
+        validation_result = validate_csv_data(uploaded_data)
+        if not validation_result['valid']:
+            return f"❌ Data validation failed:\n{chr(10).join(validation_result['errors'])}"
+        
+        # Process the data through A.U.R.A pipeline
+        processed_data = process_uploaded_data(uploaded_data)
+        
+        # Update global data
+        customer_data = processed_data
+        data_loaded = True
+        
+        return f"✅ CSV data processed successfully!\n\n**Summary:**\n- Records: {len(processed_data):,}\n- Columns: {len(processed_data.columns)}\n- Data quality: {validation_result['quality_score']:.1%}\n\n**Next steps:**\n- Explore the Dashboard tab to see your data\n- Use Customer Analysis for individual insights\n- Generate AI strategies in Retention Strategies tab"
+        
+    except Exception as e:
+        logger.error(f"CSV processing failed: {e}")
+        return f"❌ Error processing CSV file: {str(e)}"
+
+def validate_csv_data(df):
+    """Validate uploaded CSV data for A.U.R.A processing."""
+    errors = []
+    warnings = []
+    
+    # Check if DataFrame is empty
+    if df.empty:
+        errors.append("CSV file is empty")
+        return {'valid': False, 'errors': errors, 'quality_score': 0.0}
+    
+    # Check for required columns (flexible requirements)
+    required_columns = ['customer_id', 'name']
+    missing_required = [col for col in required_columns if col not in df.columns]
+    if missing_required:
+        errors.append(f"Missing required columns: {missing_required}")
+    
+    # Check for recommended columns
+    recommended_columns = ['email', 'subscription_plan', 'revenue', 'engagement_score', 'health_score']
+    missing_recommended = [col for col in recommended_columns if col not in df.columns]
+    if missing_recommended:
+        warnings.append(f"Missing recommended columns (will use defaults): {missing_recommended}")
+    
+    # Check data quality
+    null_percentage = df.isnull().sum().sum() / (len(df) * len(df.columns))
+    quality_score = 1 - null_percentage
+    
+    if null_percentage > 0.5:
+        errors.append(f"Too many missing values: {null_percentage:.1%}")
+    elif null_percentage > 0.2:
+        warnings.append(f"High missing value percentage: {null_percentage:.1%}")
+    
+    # Check for duplicate customer IDs
+    if 'customer_id' in df.columns:
+        duplicates = df['customer_id'].duplicated().sum()
+        if duplicates > 0:
+            warnings.append(f"Found {duplicates} duplicate customer IDs")
+    
+    valid = len(errors) == 0
+    return {
+        'valid': valid,
+        'errors': errors,
+        'warnings': warnings,
+        'quality_score': quality_score
+    }
+
+def process_uploaded_data(df):
+    """Process uploaded CSV data to match A.U.R.A format."""
+    logger.info("Processing uploaded data for A.U.R.A compatibility")
+    
+    # Create a copy of the data
+    processed_df = df.copy()
+    
+    # Standardize column names
+    column_mapping = {
+        'id': 'customer_id',
+        'customer_name': 'name',
+        'email_address': 'email',
+        'plan': 'subscription_plan',
+        'subscription': 'subscription_plan',
+        'total_revenue': 'total_lifetime_revenue',
+        'lifetime_revenue': 'total_lifetime_revenue',
+        'revenue': 'total_lifetime_revenue',
+        'health': 'current_health_score',
+        'health_score': 'current_health_score',
+        'engagement': 'engagement_score',
+        'risk': 'churn_risk_level',
+        'churn_risk': 'churn_risk_level',
+        'segment': 'client_segment'
+    }
+    
+    # Apply column mapping
+    for old_name, new_name in column_mapping.items():
+        if old_name in processed_df.columns and new_name not in processed_df.columns:
+            processed_df[new_name] = processed_df[old_name]
+    
+    # Ensure required columns exist with defaults
+    defaults = {
+        'customer_id': lambda: [f'CUST_{i:04d}' for i in range(1, len(processed_df) + 1)],
+        'name': lambda: [f'Customer {i}' for i in range(1, len(processed_df) + 1)],
+        'subscription_plan': lambda: np.random.choice(['Basic', 'Standard', 'Premium', 'Enterprise'], len(processed_df)),
+        'current_health_score': lambda: np.clip(np.random.normal(60, 20, len(processed_df)), 0, 100),
+        'churn_risk_level': lambda: np.random.choice(['Low', 'Medium', 'High'], len(processed_df), p=[0.6, 0.3, 0.1]),
+        'total_lifetime_revenue': lambda: np.random.lognormal(8, 1, len(processed_df)),
+        'engagement_score': lambda: np.random.uniform(0, 1, len(processed_df)),
+        'days_since_last_engagement': lambda: np.random.randint(1, 90, len(processed_df)),
+        'total_support_tickets_lifetime': lambda: np.random.poisson(3, len(processed_df)),
+        'segment': lambda: np.random.choice(['SMB', 'Medium-Value', 'High-Value'], len(processed_df), p=[0.5, 0.3, 0.2])
+    }
+    
+    # Add missing columns with defaults
+    for col, default_func in defaults.items():
+        if col not in processed_df.columns:
+            processed_df[col] = default_func()
+    
+    # Clean and standardize data
+    processed_df['customer_id'] = processed_df['customer_id'].astype(str)
+    processed_df['name'] = processed_df['name'].astype(str)
+    
+    # Ensure numeric columns are properly formatted
+    numeric_columns = ['current_health_score', 'total_lifetime_revenue', 'engagement_score', 
+                      'days_since_last_engagement', 'total_support_tickets_lifetime']
+    
+    for col in numeric_columns:
+        if col in processed_df.columns:
+            processed_df[col] = pd.to_numeric(processed_df[col], errors='coerce').fillna(0)
+    
+    # Standardize categorical columns
+    if 'subscription_plan' in processed_df.columns:
+        processed_df['subscription_plan'] = processed_df['subscription_plan'].fillna('Basic')
+    
+    if 'churn_risk_level' in processed_df.columns:
+        processed_df['churn_risk_level'] = processed_df['churn_risk_level'].fillna('Low')
+    
+    if 'segment' in processed_df.columns:
+        processed_df['segment'] = processed_df['segment'].fillna('SMB')
+    
+    logger.info(f"Data processing completed. Final shape: {processed_df.shape}")
+    return processed_df
+
 def run_data_pipeline():
     """Run the complete A.U.R.A data pipeline."""
     try:
@@ -527,6 +677,51 @@ with gr.Blocks(
                 pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="secondary")
                 status_text = gr.Textbox(label="Status", interactive=False)
             
+            # CSV Upload section
+            gr.Markdown("### 📁 Upload Your Own Data")
+            with gr.Row():
+                csv_upload = gr.File(
+                    label="Upload CSV File",
+                    file_types=[".csv"],
+                    file_count="single",
+                    info="Upload your customer data CSV file"
+                )
+                upload_btn = gr.Button("📤 Process CSV Data", variant="primary")
+            
+            # CSV format guidance
+            gr.Markdown("""
+            **📋 CSV Format Requirements:**
+            
+            **Required Columns:**
+            - `customer_id` (or `id`) - Unique customer identifier
+            - `name` (or `customer_name`) - Customer name
+            
+            **Recommended Columns:**
+            - `email` - Customer email address
+            - `subscription_plan` (or `plan`) - Subscription tier
+            - `revenue` (or `total_revenue`) - Customer revenue
+            - `engagement_score` - Customer engagement level (0-1)
+            - `health_score` - Customer health score (0-100)
+            - `churn_risk_level` - Risk level (Low/Medium/High)
+            - `segment` - Customer segment
+            
+            **💡 Tips:**
+            - Missing recommended columns will be filled with realistic defaults
+            - Data will be automatically cleaned and standardized
+            - Supports various column name formats (e.g., 'id' → 'customer_id')
+            """)
+            
+            # Sample CSV download
+            with gr.Row():
+                gr.Markdown("**📥 Need a template?** Download our sample CSV file:")
+                sample_csv = gr.File(
+                    label="Download Sample CSV",
+                    value="sample_customer_data.csv",
+                    visible=True,
+                    interactive=False,
+                    info="Click to download sample CSV template"
+                )
+            
             load_btn.click(
                 load_aura_data,
                 outputs=[status_text]
@@ -534,6 +729,12 @@ with gr.Blocks(
             
             pipeline_btn.click(
                 run_data_pipeline,
+                outputs=[status_text]
+            )
+            
+            upload_btn.click(
+                upload_and_process_csv,
+                inputs=[csv_upload],
                 outputs=[status_text]
             )
             
