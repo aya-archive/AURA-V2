@@ -798,43 +798,127 @@ with gr.Blocks(
         color: #333333;
     }
     
-    /* Comprehensive Text Color Fixes */
-    .gr-label, .gr-textbox label, .gr-dropdown label, .gr-slider label {
-        color: #333333 !important;
-        font-weight: 500;
+    /* Page-Specific Color Schemes */
+    
+    /* Dashboard Tab - Blue Theme */
+    .gr-tab[data-tab="0"] .gr-markdown,
+    .gr-tab[data-tab="0"] .gr-label,
+    .gr-tab[data-tab="0"] .gr-textbox,
+    .gr-tab[data-tab="0"] .gr-dropdown,
+    .gr-tab[data-tab="0"] .gr-slider {
+        color: #1E3A8A !important;
     }
     
-    .gr-textbox input, .gr-textbox textarea {
-        color: #333333 !important;
+    .gr-tab[data-tab="0"] h1, .gr-tab[data-tab="0"] h2, .gr-tab[data-tab="0"] h3,
+    .gr-tab[data-tab="0"] h4, .gr-tab[data-tab="0"] h5, .gr-tab[data-tab="0"] h6 {
+        color: #1E40AF !important;
+        font-weight: 700;
     }
     
-    .gr-dropdown select {
-        color: #333333 !important;
+    /* Customer Analysis Tab - Green Theme */
+    .gr-tab[data-tab="1"] .gr-markdown,
+    .gr-tab[data-tab="1"] .gr-label,
+    .gr-tab[data-tab="1"] .gr-textbox,
+    .gr-tab[data-tab="1"] .gr-dropdown,
+    .gr-tab[data-tab="1"] .gr-slider {
+        color: #166534 !important;
     }
     
-    .gr-slider .gr-label {
-        color: #333333 !important;
+    .gr-tab[data-tab="1"] h1, .gr-tab[data-tab="1"] h2, .gr-tab[data-tab="1"] h3,
+    .gr-tab[data-tab="1"] h4, .gr-tab[data-tab="1"] h5, .gr-tab[data-tab="1"] h6 {
+        color: #15803D !important;
+        font-weight: 700;
     }
     
-    .gr-plot .plotly .modebar {
-        color: #333333 !important;
+    /* Retention Strategies Tab - Purple Theme */
+    .gr-tab[data-tab="2"] .gr-markdown,
+    .gr-tab[data-tab="2"] .gr-label,
+    .gr-tab[data-tab="2"] .gr-textbox,
+    .gr-tab[data-tab="2"] .gr-dropdown,
+    .gr-tab[data-tab="2"] .gr-slider {
+        color: #7C2D12 !important;
     }
     
-    .gr-dataframe table {
-        color: #333333 !important;
+    .gr-tab[data-tab="2"] h1, .gr-tab[data-tab="2"] h2, .gr-tab[data-tab="2"] h3,
+    .gr-tab[data-tab="2"] h4, .gr-tab[data-tab="2"] h5, .gr-tab[data-tab="2"] h6 {
+        color: #991B1B !important;
+        font-weight: 700;
     }
     
-    .gr-dataframe th, .gr-dataframe td {
-        color: #333333 !important;
+    /* Forecasting Tab - Orange Theme */
+    .gr-tab[data-tab="3"] .gr-markdown,
+    .gr-tab[data-tab="3"] .gr-label,
+    .gr-tab[data-tab="3"] .gr-textbox,
+    .gr-tab[data-tab="3"] .gr-dropdown,
+    .gr-tab[data-tab="3"] .gr-slider {
+        color: #C2410C !important;
     }
     
-    .gr-chatbot .message {
-        color: #333333 !important;
+    .gr-tab[data-tab="3"] h1, .gr-tab[data-tab="3"] h2, .gr-tab[data-tab="3"] h3,
+    .gr-tab[data-tab="3"] h4, .gr-tab[data-tab="3"] h5, .gr-tab[data-tab="3"] h6 {
+        color: #EA580C !important;
+        font-weight: 700;
     }
     
-    /* Force all text to dark gray */
-    * {
-        color: #333333 !important;
+    /* Risk Analysis Tab - Red Theme */
+    .gr-tab[data-tab="4"] .gr-markdown,
+    .gr-tab[data-tab="4"] .gr-label,
+    .gr-tab[data-tab="4"] .gr-textbox,
+    .gr-tab[data-tab="4"] .gr-dropdown,
+    .gr-tab[data-tab="4"] .gr-slider {
+        color: #991B1B !important;
+    }
+    
+    .gr-tab[data-tab="4"] h1, .gr-tab[data-tab="4"] h2, .gr-tab[data-tab="4"] h3,
+    .gr-tab[data-tab="4"] h4, .gr-tab[data-tab="4"] h5, .gr-tab[data-tab="4"] h6 {
+        color: #DC2626 !important;
+        font-weight: 700;
+    }
+    
+    /* AI Assistant Tab - Teal Theme */
+    .gr-tab[data-tab="5"] .gr-markdown,
+    .gr-tab[data-tab="5"] .gr-label,
+    .gr-tab[data-tab="5"] .gr-textbox,
+    .gr-tab[data-tab="5"] .gr-dropdown,
+    .gr-tab[data-tab="5"] .gr-slider {
+        color: #0F766E !important;
+    }
+    
+    .gr-tab[data-tab="5"] h1, .gr-tab[data-tab="5"] h2, .gr-tab[data-tab="5"] h3,
+    .gr-tab[data-tab="5"] h4, .gr-tab[data-tab="5"] h5, .gr-tab[data-tab="5"] h6 {
+        color: #0D9488 !important;
+        font-weight: 700;
+    }
+    
+    /* Enhanced Tab-Specific Styling */
+    .gr-tab[data-tab="0"] .gr-markdown {
+        background: linear-gradient(135deg, #EBF8FF 0%, #DBEAFE 100%);
+        border: 1px solid #3B82F6;
+    }
+    
+    .gr-tab[data-tab="1"] .gr-markdown {
+        background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+        border: 1px solid #22C55E;
+    }
+    
+    .gr-tab[data-tab="2"] .gr-markdown {
+        background: linear-gradient(135deg, #FEF3F2 0%, #FEE2E2 100%);
+        border: 1px solid #EF4444;
+    }
+    
+    .gr-tab[data-tab="3"] .gr-markdown {
+        background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+        border: 1px solid #F97316;
+    }
+    
+    .gr-tab[data-tab="4"] .gr-markdown {
+        background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+        border: 1px solid #DC2626;
+    }
+    
+    .gr-tab[data-tab="5"] .gr-markdown {
+        background: linear-gradient(135deg, #F0FDFA 0%, #CCFBF1 100%);
+        border: 1px solid #14B8A6;
     }
     
     /* Override any light text colors */
