@@ -536,7 +536,7 @@ class GoldAggregation:
         """Get support issues summary for customer."""
         if customer['total_support_tickets_lifetime'] > 5:
             return "Multiple support tickets - proactive support recommended"
-        elif customer['avg_satisfaction_score_lifetime'] < 3:
+        elif customer.get('avg_satisfaction_score_lifetime', 5) < 3:
             return "Low satisfaction scores - support quality improvement needed"
         else:
             return "Good support experience - maintain current service level"

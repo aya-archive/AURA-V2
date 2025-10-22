@@ -71,36 +71,53 @@ def load_aura_data():
     data_loaded = True
     return "✅ Sample data generated successfully!"
 
-def upload_and_process_csv(csv_file):
-    """Upload and process CSV file through A.U.R.A pipeline."""
+def upload_and_process_csv(csv_files):
+    """Upload and process multiple CSV files through A.U.R.A pipeline."""
     global customer_data, data_loaded
     
-    if csv_file is None:
-        return "❌ No file uploaded. Please select a CSV file."
+    if not csv_files:
+        return "❌ No files uploaded. Please select CSV files."
     
     try:
-        logger.info(f"Processing uploaded CSV file: {csv_file.name}")
+        logger.info(f"Processing {len(csv_files)} uploaded CSV files")
         
-        # Read the CSV file
-        uploaded_data = pd.read_csv(csv_file.name)
+        all_processed_data = []
+        processed_files = []
+        total_records = 0
         
-        # Validate the data
-        validation_result = validate_csv_data(uploaded_data)
-        if not validation_result['valid']:
-            return f"❌ Data validation failed:\n{chr(10).join(validation_result['errors'])}"
+        # Process each uploaded file
+        for csv_file in csv_files:
+            logger.info(f"Processing file: {csv_file.name}")
+            
+            # Read the CSV file
+            uploaded_data = pd.read_csv(csv_file.name)
+            
+            # Validate the data
+            validation_result = validate_csv_data(uploaded_data)
+            if not validation_result['valid']:
+                return f"❌ Data validation failed for {csv_file.name}:\n{chr(10).join(validation_result['errors'])}"
+            
+            # Process the data
+            processed_data = process_uploaded_data(uploaded_data)
+            all_processed_data.append(processed_data)
+            processed_files.append(csv_file.name)
+            total_records += len(processed_data)
         
-        # Process the data through A.U.R.A pipeline
-        processed_data = process_uploaded_data(uploaded_data)
-        
-        # Update global data
-        customer_data = processed_data
-        data_loaded = True
-        
-        return f"✅ CSV data processed successfully!\n\n**Summary:**\n- Records: {len(processed_data):,}\n- Columns: {len(processed_data.columns)}\n- Data quality: {validation_result['quality_score']:.1%}\n\n**Next steps:**\n- Explore the Dashboard tab to see your data\n- Use Customer Analysis for individual insights\n- Generate AI strategies in Retention Strategies tab"
+        # Combine all processed data
+        if all_processed_data:
+            combined_data = pd.concat(all_processed_data, ignore_index=True)
+            
+            # Update global data
+            customer_data = combined_data
+            data_loaded = True
+            
+            return f"✅ All CSV files processed successfully!\n\n**Summary:**\n- Files processed: {len(processed_files)}\n- Total records: {total_records:,}\n- Combined columns: {len(combined_data.columns)}\n\n**Files:**\n{chr(10).join([f'- {file}' for file in processed_files])}\n\n**Next steps:**\n- Explore the Dashboard tab to see your data\n- Use Customer Analysis for individual insights\n- Generate AI strategies in Retention Strategies tab"
+        else:
+            return "❌ No data was successfully processed."
         
     except Exception as e:
         logger.error(f"CSV processing failed: {e}")
-        return f"❌ Error processing CSV file: {str(e)}"
+        return f"❌ Error processing CSV files: {str(e)}"
 
 def validate_csv_data(df):
     """Validate uploaded CSV data for A.U.R.A processing."""
@@ -957,14 +974,14 @@ with gr.Blocks(
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=2)
             
             # CSV Upload section
-            gr.Markdown("### 📁 Upload Your Own Data")
+            gr.Markdown("### 📁 Upload Your Data Files")
             with gr.Row():
                 csv_upload = gr.File(
-                    label="📤 Upload CSV File",
+                    label="📤 Upload CSV Files (Multiple files supported)",
                     file_types=[".csv"],
-                    file_count="single"
+                    file_count="multiple"
                 )
-                upload_btn = gr.Button("📤 Process CSV Data", variant="primary", size="lg")
+                upload_btn = gr.Button("📤 Process All CSV Data", variant="primary", size="lg")
             
             
             
