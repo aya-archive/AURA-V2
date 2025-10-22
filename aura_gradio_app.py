@@ -579,77 +579,77 @@ def chat_with_aura(message, history):
 with gr.Blocks(
     title="A.U.R.A - Adaptive User Retention Assistant",
     theme=gr.themes.Soft(
-        primary_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#DE8650", c300="#DE8650", c400="#DE8650", c500="#1C213F", c600="#1C213F", c700="#1C213F", c800="#1C213F", c900="#1C213F", c950="#1C213F"),
-        secondary_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#BB8F82", c300="#BB8F82", c400="#BB8F82", c500="#EE341C", c600="#EE341C", c700="#EE341C", c800="#EE341C", c900="#EE341C", c950="#EE341C"),
-        neutral_hue=gr.themes.Color(c50="#F9F3EF", c100="#F9F3EF", c200="#BB8F82", c300="#BB8F82", c400="#BB8F82", c500="#1C213F", c600="#1C213F", c700="#1C213F", c800="#1C213F", c900="#1C213F", c950="#1C213F"),
+        primary_hue=gr.themes.Color(c50="#F8C662", c100="#F8C662", c200="#F8C662", c300="#F8C662", c400="#F8C662", c500="#595082", c600="#595082", c700="#2C263F", c800="#2C263F", c900="#2C263F", c950="#2C263F"),
+        secondary_hue=gr.themes.Color(c50="#41644A", c100="#41644A", c200="#41644A", c300="#41644A", c400="#41644A", c500="#213722", c600="#213722", c700="#213722", c800="#213722", c900="#213722", c950="#213722"),
+        neutral_hue=gr.themes.Color(c50="#F8C662", c100="#F8C662", c200="#595082", c300="#595082", c400="#41644A", c500="#2C263F", c600="#2C263F", c700="#213722", c800="#213722", c900="#213722", c950="#213722"),
     ),
     css="""
     .gradio-container {
-        background: linear-gradient(135deg, #1C213F 0%, #DE8650 50%, #F9F3EF 100%);
+        background: linear-gradient(135deg, #2C263F 0%, #595082 30%, #41644A 70%, #213722 100%);
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
     }
     .gr-panel {
-        background: rgba(249, 243, 239, 0.95);
+        background: rgba(248, 198, 98, 0.95);
         border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(28, 33, 63, 0.15);
+        box-shadow: 0 20px 40px rgba(44, 38, 63, 0.25);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(187, 143, 130, 0.3);
+        border: 1px solid rgba(89, 80, 130, 0.4);
     }
     h1, h2, h3, h4, h5, h6 {
-        color: #1C213F;
+        color: #2C263F;
         font-weight: 700;
-        text-shadow: 0 2px 4px rgba(28, 33, 63, 0.1);
+        text-shadow: 0 2px 4px rgba(44, 38, 63, 0.2);
     }
     .gr-button {
-        background: linear-gradient(135deg, #1C213F 0%, #DE8650 100%);
-        color: #F9F3EF;
+        background: linear-gradient(135deg, #2C263F 0%, #595082 100%);
+        color: #F8C662;
         border-radius: 12px;
         font-weight: 600;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(28, 33, 63, 0.3);
+        box-shadow: 0 4px 15px rgba(44, 38, 63, 0.4);
         border: none;
     }
     .gr-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(28, 33, 63, 0.4);
-        background: linear-gradient(135deg, #DE8650 0%, #EE341C 100%);
+        box-shadow: 0 8px 25px rgba(44, 38, 63, 0.5);
+        background: linear-gradient(135deg, #595082 0%, #41644A 100%);
     }
     .gr-tab-button.selected {
-        background: linear-gradient(135deg, #1C213F 0%, #DE8650 100%);
-        color: #F9F3EF;
+        background: linear-gradient(135deg, #2C263F 0%, #595082 100%);
+        color: #F8C662;
         border-radius: 8px;
     }
     .gr-tab-button {
-        color: #1C213F;
+        color: #2C263F;
         border-radius: 8px;
         transition: all 0.3s ease;
     }
     .gr-tab-button:hover {
-        background: rgba(222, 134, 80, 0.1);
-        color: #DE8650;
+        background: rgba(65, 100, 74, 0.15);
+        color: #41644A;
     }
     .gr-textbox, .gr-dropdown, .gr-slider {
-        border: 2px solid rgba(187, 143, 130, 0.3);
+        border: 2px solid rgba(89, 80, 130, 0.4);
         border-radius: 8px;
-        background: rgba(249, 243, 239, 0.8);
+        background: rgba(248, 198, 98, 0.9);
     }
     .gr-textbox:focus, .gr-dropdown:focus {
-        border-color: #DE8650;
-        box-shadow: 0 0 0 3px rgba(222, 134, 80, 0.1);
+        border-color: #41644A;
+        box-shadow: 0 0 0 3px rgba(65, 100, 74, 0.2);
     }
     .gr-plot {
         border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(28, 33, 63, 0.1);
+        box-shadow: 0 8px 20px rgba(44, 38, 63, 0.2);
     }
     .gr-dataframe {
         border-radius: 12px;
-        border: 1px solid rgba(187, 143, 130, 0.3);
+        border: 1px solid rgba(89, 80, 130, 0.4);
     }
     .gr-chatbot {
         border-radius: 12px;
-        border: 1px solid rgba(187, 143, 130, 0.3);
-        background: rgba(249, 243, 239, 0.8);
+        border: 1px solid rgba(89, 80, 130, 0.4);
+        background: rgba(248, 198, 98, 0.9);
     }
     """
 ) as app:
@@ -683,8 +683,7 @@ with gr.Blocks(
                 csv_upload = gr.File(
                     label="Upload CSV File",
                     file_types=[".csv"],
-                    file_count="single",
-                    info="Upload your customer data CSV file"
+                    file_count="single"
                 )
                 upload_btn = gr.Button("📤 Process CSV Data", variant="primary")
             
@@ -718,8 +717,7 @@ with gr.Blocks(
                     label="Download Sample CSV",
                     value="sample_customer_data.csv",
                     visible=True,
-                    interactive=False,
-                    info="Click to download sample CSV template"
+                    interactive=False
                 )
             
             load_btn.click(
