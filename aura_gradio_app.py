@@ -760,6 +760,29 @@ with gr.Blocks(
         min-height: 24px !important;
     }
     
+    /* Remove flex styling from file upload */
+    .gr-file {
+        display: block !important;
+        flex: none !important;
+    }
+    
+    .gr-file .wrap {
+        display: block !important;
+        flex: none !important;
+    }
+    
+    .gr-file .gr-button {
+        display: inline-block !important;
+        flex: none !important;
+    }
+    
+    /* Remove flex from file upload container */
+    .gr-file .wrap.default.full.svelte-btia7y {
+        display: block !important;
+        flex: none !important;
+        position: static !important;
+    }
+    
     /* PWA install banner */
     .pwa-install-banner {
         position: fixed;
