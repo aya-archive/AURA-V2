@@ -588,68 +588,150 @@ with gr.Blocks(
         background: linear-gradient(135deg, #FDF4E3 0%, #F8E6C7 30%, #E8F5E8 70%, #D1EBD1 100%);
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
+        padding: 20px;
     }
+    
+    /* Clean Panel Styling */
     .gr-panel {
-        background: rgba(253, 244, 227, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(122, 107, 154, 0.15);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(122, 107, 154, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(122, 107, 154, 0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(122, 107, 154, 0.15);
+        padding: 24px;
+        margin: 16px 0;
     }
+    
+    /* Typography Improvements */
     h1, h2, h3, h4, h5, h6 {
         color: #4D386A;
-        font-weight: 700;
-        text-shadow: 0 1px 2px rgba(77, 56, 106, 0.1);
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        line-height: 1.3;
     }
+    
+    /* Clean Button Design */
     .gr-button {
         background: linear-gradient(135deg, #7A6B9A 0%, #6B5A8A 100%);
         color: #FDF4E3;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(122, 107, 154, 0.3);
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        padding: 12px 24px;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.2);
         border: none;
+        min-height: 44px;
     }
+    
     .gr-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(122, 107, 154, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(122, 107, 154, 0.3);
         background: linear-gradient(135deg, #6B5A8A 0%, #5A8A5A 100%);
     }
+    
+    /* Clean Tab Design */
     .gr-tab-button.selected {
         background: linear-gradient(135deg, #7A6B9A 0%, #6B5A8A 100%);
         color: #FDF4E3;
         border-radius: 8px;
+        font-weight: 500;
     }
+    
     .gr-tab-button {
         color: #4D386A;
         border-radius: 8px;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        padding: 8px 16px;
     }
+    
     .gr-tab-button:hover {
-        background: rgba(90, 138, 90, 0.15);
+        background: rgba(90, 138, 90, 0.1);
         color: #5A8A5A;
     }
+    
+    /* Clean Form Elements */
     .gr-textbox, .gr-dropdown, .gr-slider {
-        border: 2px solid rgba(122, 107, 154, 0.3);
+        border: 1px solid rgba(122, 107, 154, 0.2);
         border-radius: 8px;
-        background: rgba(253, 244, 227, 0.9);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px;
+        font-size: 14px;
+        transition: all 0.2s ease;
     }
+    
     .gr-textbox:focus, .gr-dropdown:focus {
         border-color: #5A8A5A;
-        box-shadow: 0 0 0 3px rgba(90, 138, 90, 0.2);
+        box-shadow: 0 0 0 2px rgba(90, 138, 90, 0.15);
+        outline: none;
     }
+    
+    /* Clean Data Display */
     .gr-plot {
         border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(122, 107, 154, 0.1);
+        box-shadow: 0 4px 16px rgba(122, 107, 154, 0.08);
+        background: white;
+        padding: 16px;
     }
+    
     .gr-dataframe {
         border-radius: 12px;
-        border: 1px solid rgba(122, 107, 154, 0.3);
+        border: 1px solid rgba(122, 107, 154, 0.15);
+        background: white;
+        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.05);
     }
+    
     .gr-chatbot {
         border-radius: 12px;
-        border: 1px solid rgba(122, 107, 154, 0.3);
-        background: rgba(253, 244, 227, 0.9);
+        border: 1px solid rgba(122, 107, 154, 0.15);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.05);
+    }
+    
+    /* Clean Metrics Display */
+    .gr-textbox[readonly] {
+        background: rgba(248, 198, 98, 0.1);
+        border: 1px solid rgba(122, 107, 154, 0.2);
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    /* Clean File Upload */
+    .gr-file {
+        border-radius: 8px;
+        border: 2px dashed rgba(122, 107, 154, 0.3);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .gr-file:hover {
+        border-color: #5A8A5A;
+        background: rgba(90, 138, 90, 0.05);
+    }
+    
+    /* Clean Markdown Styling */
+    .gr-markdown {
+        line-height: 1.6;
+        color: #4D386A;
+    }
+    
+    /* Clean Row Spacing */
+    .gr-row {
+        margin: 8px 0;
+        gap: 16px;
+    }
+    
+    /* Clean Status Display */
+    .gr-textbox[data-testid="textbox"] {
+        background: rgba(248, 198, 98, 0.1);
+        border: 1px solid rgba(122, 107, 154, 0.2);
+        border-radius: 8px;
+        padding: 12px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 13px;
     }
     """
 ) as app:
@@ -669,23 +751,28 @@ with gr.Blocks(
         
         # Dashboard Tab
         with gr.Tab("📊 Dashboard"):
-            gr.Markdown("## Executive Dashboard")
+            gr.Markdown("## 📊 Executive Dashboard")
             
             # Data loading section
             with gr.Row():
-                load_btn = gr.Button("🔄 Load A.U.R.A Data", variant="primary")
-                pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="secondary")
-                status_text = gr.Textbox(label="Status", interactive=False)
+                with gr.Column(scale=1):
+                    load_btn = gr.Button("🔄 Load A.U.R.A Data", variant="primary", size="lg")
+                with gr.Column(scale=1):
+                    pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="secondary", size="lg")
+                with gr.Column(scale=2):
+                    status_text = gr.Textbox(label="📋 Status", interactive=False, lines=2)
             
             # CSV Upload section
             gr.Markdown("### 📁 Upload Your Own Data")
             with gr.Row():
-                csv_upload = gr.File(
-                    label="Upload CSV File",
-                    file_types=[".csv"],
-                    file_count="single"
-                )
-                upload_btn = gr.Button("📤 Process CSV Data", variant="primary")
+                with gr.Column(scale=2):
+                    csv_upload = gr.File(
+                        label="📤 Upload CSV File",
+                        file_types=[".csv"],
+                        file_count="single"
+                    )
+                with gr.Column(scale=1):
+                    upload_btn = gr.Button("📤 Process CSV Data", variant="primary", size="lg")
             
             # CSV format guidance
             gr.Markdown("""
@@ -737,27 +824,34 @@ with gr.Blocks(
             )
             
             # Metrics row
+            gr.Markdown("### 📈 Key Metrics")
             with gr.Row():
-                total_customers = gr.Textbox(label="Total Customers", interactive=False)
-                high_risk = gr.Textbox(label="High Risk Customers", interactive=False)
-                avg_health = gr.Textbox(label="Average Health Score", interactive=False)
-                total_revenue = gr.Textbox(label="Total Revenue", interactive=False)
+                with gr.Column(scale=1):
+                    total_customers = gr.Textbox(label="👥 Total Customers", interactive=False, value="0")
+                with gr.Column(scale=1):
+                    high_risk = gr.Textbox(label="⚠️ High Risk Customers", interactive=False, value="0")
+                with gr.Column(scale=1):
+                    avg_health = gr.Textbox(label="💚 Average Health Score", interactive=False, value="0")
+                with gr.Column(scale=1):
+                    total_revenue = gr.Textbox(label="💰 Total Revenue", interactive=False, value="$0")
             
             # Charts row
+            gr.Markdown("### 📊 Analytics Dashboard")
             with gr.Row():
-                with gr.Column():
-                    risk_chart = gr.Plot(label="Risk Distribution")
-                with gr.Column():
-                    health_chart = gr.Plot(label="Health Score Distribution")
-            
-            # Segment chart
-            segment_chart = gr.Plot(label="Customer Segments")
+                with gr.Column(scale=1):
+                    risk_chart = gr.Plot(label="🎯 Risk Distribution")
+                with gr.Column(scale=1):
+                    health_chart = gr.Plot(label="💚 Health Score Distribution")
+                with gr.Column(scale=1):
+                    segment_chart = gr.Plot(label="👥 Customer Segments")
             
             # Customer table
+            gr.Markdown("### 👥 Customer Overview")
             customer_table = gr.Dataframe(
-                label="Customer Overview",
+                label="📋 Customer Data Table",
                 interactive=False,
-                wrap=True
+                wrap=True,
+                height=400
             )
             
             # Update dashboard when data is loaded
