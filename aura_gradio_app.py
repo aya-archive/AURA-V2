@@ -618,13 +618,51 @@ def chat_with_aura(message, history):
     history.append([message, response])
     return history, ""
 
-# Create the Gradio interface
+# Create the Gradio interface with PWA support
 with gr.Blocks(
     title="A.U.R.A - Adaptive User Retention Assistant",
+    head="""
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E85002">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="A.U.R.A">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('A.U.R.A Service Worker registered successfully');
+                    })
+                    .catch((error) => {
+                        console.log('A.U.R.A Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('A.U.R.A PWA install prompt available');
+        });
+        
+        // Handle PWA install
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('A.U.R.A PWA installed successfully');
+        });
+    </script>
+    """,
         theme=gr.themes.Soft(
-            primary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#333333", c950="#000000"),
-            secondary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#333333", c950="#000000"),
-            neutral_hue=gr.themes.Color(c50="#F9F9F9", c100="#A7A7A7", c200="#A7A7A7", c300="#646464", c400="#646464", c500="#333333", c600="#333333", c700="#000000", c800="#000000", c900="#000000", c950="#000000"),
+            primary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#555555", c950="#777777"),
+            secondary_hue=gr.themes.Color(c50="#F9F9F9", c100="#F9F9F9", c200="#A7A7A7", c300="#A7A7A7", c400="#646464", c500="#E85002", c600="#C10801", c700="#F16001", c800="#D9C3AB", c900="#555555", c950="#777777"),
+            neutral_hue=gr.themes.Color(c50="#F9F9F9", c100="#A7A7A7", c200="#A7A7A7", c300="#646464", c400="#646464", c500="#555555", c600="#555555", c700="#777777", c800="#777777", c900="#777777", c950="#777777"),
         ),
     css="""
     .gradio-container {
@@ -632,6 +670,61 @@ with gr.Blocks(
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
         padding: 20px;
+    }
+    
+    /* PWA-specific styles */
+    @media (display-mode: standalone) {
+        .gradio-container {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+    }
+    
+    /* Mobile-first responsive design */
+    @media (max-width: 768px) {
+        .gradio-container {
+            padding: 10px;
+        }
+        
+        .gr-button {
+            min-height: 48px;
+            font-size: 16px;
+        }
+        
+        .gr-tab-button {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+    }
+    
+    /* PWA install banner */
+    .pwa-install-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #E85002 0%, #C10801 100%);
+        color: #F9F9F9;
+        padding: 16px;
+        text-align: center;
+        z-index: 1000;
+        display: none;
+    }
+    
+    .pwa-install-banner.show {
+        display: block;
+    }
+    
+    .pwa-install-banner button {
+        background: rgba(249, 249, 249, 0.2);
+        color: #F9F9F9;
+        border: 1px solid rgba(249, 249, 249, 0.3);
+        padding: 8px 16px;
+        border-radius: 6px;
+        margin: 0 8px;
+        cursor: pointer;
     }
     
     /* Clean Panel Styling */
@@ -647,7 +740,7 @@ with gr.Blocks(
     
     /* Typography Improvements */
     h1, h2, h3, h4, h5, h6 {
-        color: #8B5CF6;
+        color: #555555;
         font-weight: 600;
         margin: 0 0 16px 0;
         line-height: 1.3;
@@ -682,7 +775,7 @@ with gr.Blocks(
     }
     
     .gr-tab-button {
-        color: #333333;
+        color: #555555;
         background: rgba(232, 80, 2, 0.1);
         border: 1px solid rgba(232, 80, 2, 0.3);
         border-radius: 8px;
@@ -709,7 +802,7 @@ with gr.Blocks(
         background: rgba(255, 255, 255, 0.95);
         padding: 12px;
         font-size: 14px;
-        color: #8B5CF6;
+        color: #555555;
         transition: all 0.2s ease;
     }
     
@@ -772,7 +865,7 @@ with gr.Blocks(
     /* Clean Markdown Styling */
     .gr-markdown {
         line-height: 1.6;
-        color: #8B5CF6;
+        color: #555555;
         background: #F5F5F5;
         padding: 20px;
         border-radius: 12px;
@@ -791,7 +884,7 @@ with gr.Blocks(
     }
     
     .gr-markdown p {
-        color: #8B5CF6;
+        color: #555555;
         margin: 12px 0;
         font-size: 15px;
         line-height: 1.7;
@@ -799,13 +892,13 @@ with gr.Blocks(
     }
     
     .gr-markdown ul, .gr-markdown ol {
-        color: #8B5CF6;
+        color: #555555;
         margin: 12px 0;
         padding-left: 24px;
     }
     
     .gr-markdown li {
-        color: #8B5CF6;
+        color: #555555;
         margin: 6px 0;
         font-size: 15px;
         line-height: 1.6;
@@ -973,12 +1066,12 @@ with gr.Blocks(
         color: #E85002 !important;
     }
     
-    /* Customer Analysis Tab - Dark gray output text */
+    /* Customer Analysis Tab - Light gray output text */
     .gr-tab[data-tab="1"] .gr-dataframe,
     .gr-tab[data-tab="1"] .gr-plot,
     .gr-tab[data-tab="1"] .gr-textbox[readonly],
     .gr-tab[data-tab="1"] .gr-chatbot {
-        color: #333333 !important;
+        color: #555555 !important;
     }
     
     /* Retention Strategies Tab - Red gradient output text */
