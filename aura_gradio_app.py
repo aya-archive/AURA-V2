@@ -521,27 +521,36 @@ def get_retention_strategies():
         return "No data loaded. Please load data first."
     
     strategies = """
-    ## 🎯 A.U.R.A Retention Strategies
-    
-    ### High-Risk Customer Intervention
-    - **Immediate Action Required:** {high_risk_count} customers at high churn risk
-    - **Strategy:** Proactive outreach with personalized retention offers
-    - **Timeline:** Within 48 hours
-    
-    ### Health Score Improvement
-    - **Focus Area:** {low_health_count} customers with health scores below 50
-    - **Strategy:** Enhanced onboarding and success management
-    - **Timeline:** 2-4 weeks improvement cycle
-    
-    ### Engagement Recovery
-    - **Target:** {low_engagement_count} customers with low recent engagement
-    - **Strategy:** Multi-channel re-engagement campaigns
-    - **Timeline:** 1-2 weeks campaign duration
-    
-    ### Revenue Optimization
-    - **Opportunity:** {upsell_candidates} customers ready for plan upgrades
-    - **Strategy:** Value-based upselling with ROI demonstrations
-    - **Timeline:** Next billing cycle
+# 🎯 **A.U.R.A Retention Strategies**
+
+## 🚨 **High-Risk Customer Intervention**
+**Immediate Action Required:** {high_risk_count} customers at high churn risk
+- **Strategy:** Proactive outreach with personalized retention offers
+- **Timeline:** Within 48 hours
+- **Success Metrics:** Track intervention success rates and customer recovery
+
+## 💚 **Health Score Improvement**
+**Focus Area:** {low_health_count} customers with health scores below 50
+- **Strategy:** Enhanced onboarding and success management
+- **Timeline:** 2-4 weeks improvement cycle
+- **Implementation:** Automated health score monitoring and alerts
+
+## 🔄 **Engagement Recovery**
+**Target:** {low_engagement_count} customers with low recent engagement
+- **Strategy:** Multi-channel re-engagement campaigns
+- **Timeline:** 1-2 weeks campaign duration
+- **Channels:** Email, in-app notifications, and direct outreach
+
+## 💰 **Revenue Optimization**
+**Opportunity:** {upsell_candidates} customers ready for plan upgrades
+- **Strategy:** Value-based upselling with ROI demonstrations
+- **Timeline:** Next billing cycle
+- **Approach:** Data-driven recommendations and personalized offers
+
+## 📊 **Implementation Guidelines**
+- **Priority Matrix:** Focus on high-value, high-risk customers first
+- **Success Metrics:** Track retention rates, revenue impact, and customer satisfaction
+- **Follow-up:** Regular monitoring and adjustment of retention tactics
     """.format(
         high_risk_count=len(customer_data[customer_data.get('churn_risk_level', '') == 'High']),
         low_health_count=len(customer_data[customer_data.get('current_health_score', 100) < 50]),
@@ -721,6 +730,49 @@ with gr.Blocks(
     .gr-markdown {
         line-height: 1.6;
         color: #4D386A;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(122, 107, 154, 0.2);
+        box-shadow: 0 2px 8px rgba(122, 107, 154, 0.05);
+    }
+    
+    /* Enhanced Markdown Text Styling */
+    .gr-markdown h1, .gr-markdown h2, .gr-markdown h3, 
+    .gr-markdown h4, .gr-markdown h5, .gr-markdown h6 {
+        color: #2C263F;
+        font-weight: 600;
+        margin: 16px 0 8px 0;
+    }
+    
+    .gr-markdown p {
+        color: #4D386A;
+        margin: 8px 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .gr-markdown ul, .gr-markdown ol {
+        color: #4D386A;
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+    
+    .gr-markdown li {
+        color: #4D386A;
+        margin: 4px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .gr-markdown strong, .gr-markdown b {
+        color: #2C263F;
+        font-weight: 600;
+    }
+    
+    .gr-markdown em, .gr-markdown i {
+        color: #5A8A5A;
+        font-style: italic;
     }
     
     /* Clean Row Spacing */
