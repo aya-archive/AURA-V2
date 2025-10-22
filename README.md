@@ -55,10 +55,10 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
 
 ### Technology Stack
 - **Backend**: Python 3.8+, Pandas, NumPy, Scikit-learn
-- **Frontend**: Streamlit, Plotly, Matplotlib
+- **Frontend**: Gradio, Streamlit, Plotly, Matplotlib
 - **AI/ML**: Prophet, Transformers, Sentence-Transformers
 - **Data**: Parquet, CSV, JSON
-- **Deployment**: Streamlit Cloud, Docker
+- **Deployment**: Gradio Spaces, Streamlit Cloud, Docker
 
 ## 🚀 Quick Start
 
@@ -91,6 +91,13 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
    ```
 
 5. **Launch the application**
+   
+   **Gradio Interface (Recommended):**
+   ```bash
+   python3 aura_gradio_app.py
+   ```
+   
+   **Streamlit Interface:**
    ```bash
    streamlit run src/dashboard/app.py
    ```
@@ -175,23 +182,44 @@ python -m pytest --cov=src --cov-report=html
 
 ## 📈 Usage Examples
 
-### Dashboard Navigation
+### Gradio Interface (Recommended)
+The modern Gradio interface provides 6 main tabs:
+
+#### 📊 Dashboard Tab
+- **Load Data**: Click "Load A.U.R.A Data" to load customer data or generate sample data
+- **Run Pipeline**: Click "Run Data Pipeline" to execute the complete Bronze/Silver/Gold pipeline
+- **View Metrics**: Real-time KPIs including total customers, high-risk count, average health score
+- **Interactive Charts**: Risk distribution, health score distribution, and customer segments
+
+#### 👥 Customer Analysis Tab
+- **Individual Analysis**: Enter a customer ID to get detailed analysis and recommendations
+- **Customer Overview**: View comprehensive customer profiles with health scores and risk levels
+
+#### 💡 Retention Strategies Tab
+- **AI Recommendations**: Get personalized retention strategies based on customer data
+- **Strategy Implementation**: Step-by-step guidance for implementing retention programs
+
+#### 📈 Forecasting Tab
+- **Time Series Prediction**: Use Prophet model to forecast revenue, engagement, or customer count
+- **Interactive Controls**: Select metric type and forecast periods (7-365 days)
+- **Visual Insights**: Interactive charts with confidence intervals and trend analysis
+
+#### ⚠️ Risk Analysis Tab
+- **Individual Risk Assessment**: Analyze specific customers using the decision engine
+- **Batch Processing**: Process all customers for comprehensive risk analysis
+- **Priority Classification**: Get priority levels and recommended actions for each customer
+
+#### 🤖 AI Assistant Tab
+- **Natural Language Queries**: Ask questions like "Show me high-risk customers"
+- **Data Insights**: Request analysis like "What's our churn risk distribution?"
+- **Strategy Advice**: Get recommendations like "What strategies should I use?"
+- **Interactive Chat**: Conversational AI for data exploration and insights
+
+### Streamlit Interface (Legacy)
 1. **Load Data**: Use the sidebar to load customer data or generate sample data
 2. **Apply Filters**: Filter by risk level, customer segment, or date range
 3. **Explore Insights**: View executive summary, risk analysis, and customer details
 4. **Monitor KPIs**: Track key metrics and trends in real-time
-
-### Strategy Implementation
-1. **Browse Strategies**: Explore the comprehensive retention strategy playbook
-2. **Get Recommendations**: Receive personalized strategy suggestions
-3. **Simulate Impact**: Test different strategies and predict outcomes
-4. **Track Results**: Monitor implementation progress and success metrics
-
-### AI Chatbot Interaction
-1. **Natural Queries**: Ask questions like "Show me high-risk customers"
-2. **Data Insights**: Request analysis like "What's our churn risk distribution?"
-3. **Strategy Advice**: Get recommendations like "What strategies should I use?"
-4. **Simulation**: Test scenarios like "Simulate retention strategies"
 
 ## 🔒 Security & Privacy
 
