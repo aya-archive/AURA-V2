@@ -130,10 +130,27 @@ def validate_csv_data(df):
         return {'valid': False, 'errors': errors, 'quality_score': 0.0}
     
     # Check for required columns (flexible requirements)
-    required_columns = ['customer_id', 'name']
+    # Only require customer_id, other columns are optional
+    required_columns = ['customer_id']
     missing_required = [col for col in required_columns if col not in df.columns]
     if missing_required:
         errors.append(f"Missing required columns: {missing_required}")
+    
+    # Check for alternative customer ID column names
+    if 'customer_id' not in df.columns:
+        alternative_ids = ['id', 'customer_pk', 'user_id', 'client_id']
+        found_alternative = None
+        for alt_id in alternative_ids:
+            if alt_id in df.columns:
+                found_alternative = alt_id
+                break
+        
+        if found_alternative:
+            # Rename the alternative column to customer_id
+            df = df.rename(columns={found_alternative: 'customer_id'})
+            warnings.append(f"Renamed '{found_alternative}' to 'customer_id'")
+        else:
+            errors.append("No customer identifier column found. Please include 'customer_id', 'id', 'customer_pk', 'user_id', or 'client_id'")
     
     # Check for recommended columns
     recommended_columns = ['email', 'subscription_plan', 'revenue', 'engagement_score', 'health_score']
