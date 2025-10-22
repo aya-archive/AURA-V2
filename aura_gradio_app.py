@@ -699,6 +699,26 @@ with gr.Blocks(
         }
     }
     
+    /* Dashboard compact buttons */
+    .gr-tab[data-tab="0"] .gr-button {
+        font-size: 11px;
+        padding: 6px 12px;
+        min-height: 28px;
+        border-radius: 6px;
+    }
+    
+    /* Compact form elements for dashboard */
+    .gr-tab[data-tab="0"] .gr-textbox {
+        font-size: 12px;
+        padding: 8px;
+        min-height: 32px;
+    }
+    
+    /* Compact file upload */
+    .gr-tab[data-tab="0"] .gr-file {
+        font-size: 12px;
+    }
+    
     /* PWA install banner */
     .pwa-install-banner {
         position: fixed;
@@ -750,14 +770,14 @@ with gr.Blocks(
     .gr-button {
         background: linear-gradient(135deg, #E85002 0%, #C10801 100%);
         color: #F9F9F9;
-        border-radius: 10px;
+        border-radius: 8px;
         font-weight: 500;
-        font-size: 14px;
-        padding: 12px 24px;
+        font-size: 12px;
+        padding: 8px 16px;
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px rgba(232, 80, 2, 0.2);
         border: none;
-        min-height: 44px;
+        min-height: 32px;
     }
     
     .gr-button:hover {
@@ -1139,16 +1159,16 @@ with gr.Blocks(
             with gr.Row():
                 with gr.Column(scale=1):
                     status_text = gr.Textbox(label="📋 Status", interactive=False, lines=1)
-                with gr.Column(scale=2):
+                with gr.Column(scale=3):
                     csv_upload = gr.File(
                         label="📤 Upload CSV Files (Multiple files supported)",
                         file_types=[".csv"],
                         file_count="multiple"
                     )
                 with gr.Column(scale=1):
-                    upload_btn = gr.Button("📤 Process All CSV Data", variant="primary", size="sm")
+                    upload_btn = gr.Button("📤 Process", variant="primary", size="sm")
                 with gr.Column(scale=1):
-                    pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="primary", size="sm")
+                    pipeline_btn = gr.Button("⚙️ Pipeline", variant="primary", size="sm")
             
             
             
