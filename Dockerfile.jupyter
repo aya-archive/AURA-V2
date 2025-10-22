@@ -1,0 +1,79 @@
+# A.U.R.A - Jupyter Development Environment Dockerfile
+# This Dockerfile creates a development environment with Jupyter Lab
+# for data exploration, model experimentation, and AI chatbot development
+
+# Use Python 3.11 slim image as base
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    JUPYTER_ENABLE_LAB=yes
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    make \
+    libgomp1 \
+    libgfortran5 \
+    libfreetype6-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libatlas-base-dev \
+    curl \
+    git \
+    vim \
+    htop \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash aura
+USER aura
+WORKDIR /home/aura/app
+
+# Copy requirements and install Python dependencies
+COPY --chown=aura:aura requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Install additional Jupyter extensions for data science
+RUN pip install --user \
+    jupyterlab-git \
+    jupyterlab-lsp \
+    jupyterlab-widgets \
+    ipywidgets \
+    jupyterlab-plotly \
+    jupyterlab-drawio
+
+# Copy application code
+COPY --chown=aura:aura . .
+
+# Create necessary directories
+RUN mkdir -p data/bronze data/silver data/gold data/temp \
+    && mkdir -p models/forecasting models/decision_engine models/chatbot \
+    && mkdir -p uploads logs notebooks
+
+# Set proper permissions
+RUN chmod -R 755 data/ models/ uploads/ logs/ notebooks/
+
+# Expose Jupyter port
+EXPOSE 8888
+
+# Configure Jupyter Lab
+RUN jupyter lab --generate-config
+RUN echo "c.ServerApp.ip = '0.0.0.0'" >> /home/aura/.jupyter/jupyter_lab_config.py
+RUN echo "c.ServerApp.port = 8888" >> /home/aura/.jupyter/jupyter_lab_config.py
+RUN echo "c.ServerApp.open_browser = False" >> /home/aura/.jupyter/jupyter_lab_config.py
+RUN echo "c.ServerApp.allow_root = False" >> /home/aura/.jupyter/jupyter_lab_config.py
+RUN echo "c.ServerApp.token = 'aura-dev-token'" >> /home/aura/.jupyter/jupyter_lab_config.py
+RUN echo "c.ServerApp.password = ''" >> /home/aura/.jupyter/jupyter_lab_config.py
+
+# Set default command
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--token=aura-dev-token"]

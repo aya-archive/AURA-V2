@@ -1,0 +1,166 @@
+# A.U.R.A (Adaptive User Retention Assistant) - Docker Compose Configuration
+# This file orchestrates the complete A.U.R.A platform with all necessary services
+# for development, testing, and production environments
+
+version: '3.8'
+
+services:
+  # Main A.U.R.A Application (Streamlit Dashboard + AI Models)
+  aura-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura-main-app
+    ports:
+      - "8501:8501"  # Streamlit dashboard
+    volumes:
+      # Mount data directories for persistent storage (Medallion architecture)
+      - ./data:/home/aura/app/data
+      - ./models:/home/aura/app/models
+      - ./uploads:/home/aura/app/uploads
+      - ./logs:/home/aura/app/logs
+      # Mount source code for development (hot reload)
+      - ./src:/home/aura/app/src
+    environment:
+      - PYTHONPATH=/home/aura/app/src
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=false
+      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
+    networks:
+      - aura-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: aura-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - aura-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  # PostgreSQL for metadata and configuration storage (optional for MVP)
+  postgres:
+    image: postgres:15-alpine
+    container_name: aura-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=aura_db
+      - POSTGRES_USER=aura_user
+      - POSTGRES_PASSWORD=aura_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - aura-network
+    restart: unless-stopped
+    profiles:
+      - database  # Only start when explicitly requested
+
+  # Jupyter Notebook for data exploration and model development
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    container_name: aura-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/aura/app/notebooks
+      - ./data:/home/aura/app/data
+      - ./src:/home/aura/app/src
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=aura-dev-token
+    networks:
+      - aura-network
+    restart: unless-stopped
+    profiles:
+      - development  # Only start in development mode
+
+  # Data Pipeline Worker (for batch processing)
+  data-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura-data-worker
+    command: python src/data_pipeline/orchestrator.py
+    volumes:
+      - ./data:/home/aura/app/data
+      - ./src:/home/aura/app/src
+      - ./logs:/home/aura/app/logs
+    environment:
+      - PYTHONPATH=/home/aura/app/src
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - aura-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+    profiles:
+      - production  # Only start in production mode
+
+  # Monitoring and Logging
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aura-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - aura-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aura-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=aura-admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - aura-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+
+# Named volumes for persistent data storage
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Custom network for service communication
+networks:
+  aura-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

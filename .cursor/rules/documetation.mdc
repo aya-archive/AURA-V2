@@ -1,0 +1,1202 @@
+## Product Requirements Document
+A.U.R.A Product Requirements Document (PRD)
+
+1. Introduction
+Project Name: A.U.R.A (AI-Unified Retention Analytics)
+Document Version: 1.0
+Date: [Current Date]
+Author: [Your Name/Team]
+Purpose: This document details the product requirements for A.U.R.A, an AI-powered, cloud-managed platform for client monitoring, churn prediction, and retention strategy optimization. It outlines the vision, goals, features, and technical specifications necessary for development, with a specific focus on the MVP for the hackathon.
+
+2. Executive Summary
+A.U.R.A is envisioned as a transformative platform that empowers businesses and account managers to proactively manage client relationships. By ingesting and processing diverse client data through a Medallion architecture, it leverages AI models to predict churn, identify upsell opportunities, and recommend targeted retention strategies. Business insights are delivered via intuitive dashboards, enabling data-driven decision-making and operational efficiency. The MVP focuses on establishing the end-to-end data pipeline, a foundational AI model, and basic dashboard visualization, with a concentrated effort on developing an AI chatbot during the hackathon.
+
+3. Vision & Goals
+3.1. Vision
+Build a cloud-managed AI platform that ingests data, processes it using a Medallion architecture, applies forecasting and decision-making AI models, and delivers business insights through dashboards.
+
+3.2. Core Objective (MVP)
+Deliver a functional prototype that ingests data, processes it, and displays key metrics via dashboard.
+
+3.3. Overall Goals
+*   Proactive client management: Identify at-risk clients before churn occurs.
+*   Data-driven insights: Provide actionable intelligence on client health, engagement, and performance.
+*   Operational efficiency: Automate data analysis and recommendation generation, reducing manual workload.
+*   Prevent churn: Equip teams with tools to intervene effectively.
+*   Evaluate retention campaigns: Measure the effectiveness of strategies.
+*   Scale client monitoring: Support growing client bases with consistent insights.
+
+4. Target Audience & User Needs
+4.1. Target Audience
+*   Businesses (SMEs and Enterprises)
+*   Account Managers
+*   Client Success Teams
+*   Retention Specialists
+*   Business Analysts
+
+4.2. Pain Points Addressed
+*   Scattered and incomplete client data across multiple systems.
+*   Difficulty in early identification of at-risk clients.
+*   Time-consuming and manual analysis of client behavior.
+*   Lack of clear, data-backed retention strategy recommendations.
+*   Inefficient allocation of retention resources.
+
+4.3. Value Proposition
+*   Centralized client monitoring dashboard for a holistic view.
+*   AI-powered churn prediction for early warnings.
+*   Visualizations of trends, correlations, and feature importance.
+*   Actionable insights guiding targeted interventions.
+*   Reduced inefficiencies and improved resource allocation.
+*   Empowers organizations to prevent churn, evaluate campaign effectiveness, and scale client monitoring.
+
+5. MVP Scope (Hackathon Focus)
+The MVP aims to establish the fundamental pipeline from data ingestion to dashboard visualization with a simple AI application. The Hackathon's primary deliverable is the AI Chatbot within this MVP framework.
+
+5.1. Data Ingestion
+*   Ability to load static or sample datasets into the Bronze layer.
+
+5.2. Data Processing (Silver/Gold Layers)
+*   Apply minimal cleaning and feature extraction to transform Bronze data to Silver.
+*   Aggregate and curate data for basic KPIs and AI model inputs in the Gold layer.
+
+5.3. AI Models
+*   Implement a simple forecasting model (e.g., Prophet) for basic trend prediction.
+*   Develop a rule-based decision engine for initial client retention recommendations.
+
+5.4. Dashboard
+*   Display basic Key Performance Indicators (KPIs) relevant to client health and engagement.
+*   Utilize a chosen BI tool (e.g., Power BI / Looker Studio for initial dashboards, potentially Streamlit for custom UI).
+
+5.5. Hackathon Focus: AI Chatbot
+*   Deliver a functional prototype of the AI Chatbot.
+*   The chatbot will interpret and explore curated Gold layer data.
+*   It will guide retention strategy selection and simulation based on predictive insights, making data actionable.
+
+6. MVP Success Criteria
+*   An end-to-end functional flow from data ingestion through AI processing to dashboard visualization.
+*   A deployable demo link or dashboard URL accessible for review.
+*   A foundational architecture established that supports future scaling and feature enhancements.
+*   A functional prototype of the AI chatbot capable of basic data interpretation and strategy guidance.
+
+7. Functional Requirements
+
+7.1. Data Journey & Medallion Architecture
+The platform will implement a Medallion data hierarchy to ensure data quality, consistency, and reusability across analytics and AI applications.
+
+7.1.1. Bronze Layer – Raw Data (Landing Zone)
+*   **Purpose:** Store raw, unprocessed data as ingested from source systems, preserving fidelity and traceability.
+*   **Key Entities & Attributes:**
+    *   Customer Demographics: `customer_id`, `name`, `age`, `gender`, `location`, `subscription_type`, `account_creation_date`.
+    *   Transaction History: `transaction_id`, `customer_id`, `amount`, `currency`, `payment_method`, `transaction_date`.
+    *   Engagement Logs: `event_id`, `customer_id`, `event_type`, `timestamp`, `device_type`, `feature_used`.
+    *   Support & Interaction Data: `ticket_id`, `customer_id`, `issue_type`, `created_at`, `resolved_at`, `satisfaction_score`.
+    *   Survey & Feedback: `survey_id`, `customer_id`, `response_date`, `nps_score`, `comments`.
+    *   Optional External Data: Social media mentions, market indicators.
+*   **Data Characteristics:** Semi-structured and structured; high volume for engagement logs; low velocity for demographics.
+*   **Ingestion Frequency:**
+    *   Low-velocity (Demographics, Surveys): Daily or weekly batches.
+    *   Moderate-velocity (Transactions, Support): Hourly or daily batches.
+    *   High-velocity (Engagement Logs): Real-time or near real-time streaming.
+
+7.1.2. Silver Layer – Cleansed & Enriched Data
+*   **Purpose:** Clean, validate, standardize, and join raw data for consistent analysis.
+*   **Key Transformations / Aggregations:**
+    *   Data Cleansing: Remove duplicates, standardize formats (dates, currencies), handle missing values (imputation or removal).
+    *   Enrichment: Join engagement logs with customer demographics; map transactions to standard categories.
+    *   Derived Metrics:
+        *   Engagement score per client (e.g., `events_last_30_days` / `avg_events`).
+        *   Average transaction value (`total_amount` / `total_transactions`).
+        *   Churn indicators (e.g., inactivity > X days, late payments).
+    *   Time Standardization: Convert timestamps to consistent time zones, create time buckets (daily/weekly/monthly).
+*   **Resulting Entities:**
+    *   `customer_profile_silver`: Demographics + derived engagement metrics + transaction aggregates.
+    *   `transaction_summary_silver`: Daily/weekly aggregates per client.
+    *   `engagement_summary_silver`: Event counts and trends per client.
+
+7.1.3. Gold Layer – Business-Level Aggregates & Curated Datasets
+*   **Purpose:** Provide ready-to-use datasets for dashboards, AI models, and reporting.
+*   **Key Transformations / Aggregations:**
+    *   Client Health Scores: Weighted combination of engagement, support interactions, and transaction trends.
+    *   Retention Risk Flags: High/medium/low risk derived from churn rules.
+    *   Upsell/Cross-Sell Recommendations: Identify clients likely to adopt additional features based on usage patterns.
+    *   Time-Series Aggregates: Monthly MRR/ARR growth, cohort retention, feature adoption trends.
+    *   Segmented Metrics: By client tier, region, or industry for dashboard filtering.
+*   **Resulting Entities:**
+    *   `customer_health_gold`: `customer_id`, `health_score`, `risk_level`, `recommended_action`.
+    *   `dashboard_metrics_gold`: Aggregated KPIs for visualization.
+    *   `ai_model_inputs_gold`: Features prepared for AI models (e.g., engagement vectors, churn signals, transaction aggregates).
+
+7.1.4. Summary of Transformations Between Layers
+*   **Bronze → Silver:** Data cleaning, standardization, deduplication, joins, derived metrics. Purpose: Ensure consistent, usable datasets for analysis.
+*   **Silver → Gold:** Aggregation, scoring, risk flagging, feature engineering for AI, KPI calculation. Purpose: Provide curated, business-ready datasets for dashboards and AI models.
+
+7.2. Dashboard (Client Monitoring)
+The dashboard will provide actionable insights into client health, engagement, and business performance.
+*   **Key Metrics:** Client health scores, churn risk, engagement levels, MRR/ARR growth, support metrics (ticket volume, resolution times), feature adoption patterns.
+*   **Visualizations:**
+    *   Funnel charts: Illustrate client progression through onboarding or upsell journeys.
+    *   Heatmaps: Reveal engagement intensity across features or touchpoints.
+    *   Scatter plots: Identify relationships between usage and revenue.
+    *   Trend lines/Sparklines: Track performance changes over time.
+    *   Cohort analyses: Monitor retention and behavior across client groups.
+    *   Geographic maps: Visualize client distribution and regional performance.
+*   **Interactive Components:**
+    *   Filters: By region, industry, client tier, or product.
+    *   Drill-downs: Access client-level details from high-level KPIs.
+    *   Date range selectors: Support time-based comparisons.
+    *   Alert systems: Automatically flag at-risk clients or upcoming contract milestones.
+    *   What-if scenario simulations and export options.
+*   **User Experience (UX) & Information Hierarchy:**
+    *   **Top Section:** Executive summary with high-level KPIs and trend indicators for a quick snapshot.
+    *   **Middle Section:** Detailed insights through charts and interactive visualizations for deeper exploration.
+    *   **Bottom Section:** Actionable items (at-risk clients, high-potential upsell opportunities, notifications) with quick-action options.
+    *   Design Principles: Progressive disclosure, consistent color coding, minimal cognitive load, responsiveness, and action-orientation.
+
+7.3. AI Chatbot (Hackathon Focus)
+The AI chatbot is designed to be a strategic partner, advising, simulating, and guiding actions.
+*   **Core Functionality:**
+    *   Help users quickly interpret and explore curated Gold layer data.
+    *   Guide retention strategy selection and simulation based on predictive insights.
+*   **Strategic Role:**
+    *   Not just answering queries, but advising, simulating, and guiding actions.
+    *   Bridges the gap between raw AI insights and practical retention strategies.
+    *   Makes the platform actionable rather than purely descriptive.
+
+7.4. AI Models & Decision Making
+*   **Forecasting Model (MVP):** Simple forecasting model (e.g., Prophet) to predict future trends in client behavior or business metrics.
+*   **Rule-Based Decision Engine (MVP):**
+    *   Identifies clients at risk of churn, suggests targeted retention strategies, and highlights upsell opportunities.
+    *   Uses predefined rules based on client data such as engagement trends, NPS scores, support interactions, and contract timelines.
+    *   Surfaces decisions in the dashboard via alerts, scorecards, and recommendation panels, with drill-down capabilities showing the data behind each recommendation.
+    *   **User Actions:** Account managers or retention specialists are expected to act on these insights by prioritizing outreach, executing suggested actions (e.g., scheduling calls, offering incentives, providing training), monitoring client responses, and escalating high-risk or high-value cases as needed. This creates a closed-loop for proactive client retention management.
+
+8. Technical Architecture & Stack
+
+8.1. High-Level Architecture
+The AI platform will operate on a hybrid model. AI models will be installed locally on client servers to ensure data security and compliance, with sensitive client data remaining on-premises. The cloud backend will handle model management, updates, monitoring, and orchestration without processing sensitive client data.
+
+8.2. Cloud Backend (AWS Preferred for Orchestration/Management)
+*   **Serverless Functions:** For lightweight orchestration and automation (e.g., AWS Lambda).
+*   **Container Orchestration:** For managing services, model updates, and deployments (e.g., AWS ECS/EKS).
+*   **Managed Databases:** To store metadata, deployment logs, and anonymized telemetry (e.g., AWS RDS, DynamoDB).
+*   **API Gateway:** To securely expose management endpoints and facilitate communication.
+*   **Monitoring & Logging Tools:** To track deployment status, system health, and performance (e.g., AWS CloudWatch, Grafana).
+*   **Data Handling:** Only metadata, telemetry, or anonymized logs are sent to the cloud. All sensitive client data remains on-premises.
+
+8.3. Frontend / Dashboard
+*   **Responsive Web Application:** Not a PWA. Designed for accessibility across various devices.
+*   **MVP Dashboard Tool:** Power BI / Looker Studio for initial basic KPI visualization.
+*   **Custom UI/Hackathon:** Streamlit for developing the web interface and potentially hosting the AI chatbot.
+
+8.4. Technology Stack (Libraries & Tools)
+| Category | Library | Purpose |
+| :--------------------------- | :------------------------------- | :-------------------------- |
+| **Data** | `pandas`, `numpy` | Data loading and cleaning |
+| **EDA / QC** | `sweetviz` | Quick data analysis report |
+| **Modeling** | `scikit-learn`, `xgboost` | AI models (for more complex scenarios beyond MVP) |
+| **Forecasting (MVP)** | `Prophet` | Simple forecasting model |
+| **Preprocessing** | `ColumnTransformer`, `Pipeline` | Feature cleaning and transformation |
+| **Dashboard/UI (MVP)** | `streamlit` | Web interface development, hosting the chatbot |
+| **Persistence** | `joblib` | Save/load models and pipeline objects |
+| **Visualization (Optional)** | `matplotlib`, `plotly` | Custom chart generation |
+| **AutoML (Optional)** | Hugging Face AutoTrain | Free hosted AutoML for quick MVP model generation |
+
+8.5. Hosting (MVP)
+*   **Hosting:** Streamlit Cloud (free tier) for the MVP application.
+*   **File Uploads/Outputs:** Local folder (`./uploads`, `./models`) for model persistence and data handling.
+*   **Database (Optional for MVP):** Skip for now; focus on file-based data for simplicity.
+
+9. Security & Governance (Lightweight for MVP, Ongoing Development)
+*   **IAM & Role-Based Access:** Implement role-based access control (RBAC) for managing user permissions, both for the platform's cloud management components and locally deployed instances.
+*   **Audit Trails & Data Lineage:** Maintain logs of data transformations, access, and model deployments for traceability and compliance.
+*   **Data Encryption & Key Management:** Ensure data at rest and in transit is encrypted, utilizing appropriate key management solutions. Local client data encryption is paramount.
+
+10. Performance & Scalability Targets
+
+10.1. Concurrent User Load
+*   **SME MVP:** 50–200 concurrent users without performance degradation.
+*   **Enterprise Production:** 500–2,000+ concurrent users, scaling dynamically based on client adoption.
+*   **Implications:** Backend services, APIs, and database queries must be optimized for concurrent requests, possibly utilizing load balancing and horizontal scaling.
+
+10.2. Data Processing Latency
+*   **Dashboard Data Refresh:**
+    *   Acceptable Latency: 1–5 minutes for near-real-time operational dashboards.
+    *   Acceptable Latency: Up to 15–30 minutes for non-critical, aggregated analytics.
+*   **Considerations:** Streaming ingestion for high-velocity data (clickstreams, engagement logs), incremental ETL or micro-batch processing for transaction/support data, caching of frequently accessed KPIs.
+*   **Data Volume Impact:** Pipelines must scale elastically (e.g., via Spark, BigQuery, or other distributed processing frameworks) to handle millions of records.
+
+10.3. AI Model Inference Performance (Local on Client Servers)
+*   **Target Response Time:** <500 ms for real-time decision support or recommendations; up to 1–2 seconds for batch scoring.
+*   **Scalability Considerations:** Each client’s server must have sufficient CPU/GPU resources to handle concurrent inferences if multiple users trigger actions simultaneously.
+*   **Rule-Based Engine (MVP):** Should return recommendations in <200–500 ms per client evaluation and scale efficiently.
+
+10.4. Chatbot / Interactive AI Performance
+*   **Target Response Time:**
+    *   Real-time chat interactions: <1 second for local AI responses.
+    *   If cloud orchestration is involved: <2 seconds.
+*   **Scalability Considerations:** Maintain stateless session management to support multiple simultaneous chatbot interactions. Use autoscaling instances or serverless endpoints if hosted centrally.
+
+10.5. Overall System Considerations
+*   **Horizontal Scalability:** Backend APIs, databases, and orchestration layers must scale out efficiently.
+*   **Caching & Optimization:** Leverage in-memory caches (Redis, Memcached) for frequently accessed dashboards, metrics, and AI outputs.
+*   **High Availability:** Production architecture will include failover, redundancy, and multi-AZ deployment to ensure uptime.
+
+11. Metrics for Success
+*   **Data Pipeline Uptime:** Percentage of time data pipelines are fully operational.
+*   **AI Accuracy:** Forecast accuracy (e.g., MAPE for Prophet), Decision accuracy (precision/recall for churn prediction, recommendation acceptance rate).
+*   **Dashboard Adoption Rate:** Number of active users and frequency of dashboard access.
+*   **Cost per Insight:** The efficiency of generating actionable insights relative to infrastructure and operational costs.
+*   **Client Retention Improvement:** Post-deployment, measure changes in client churn rates for active users of the platform.
+
+12. Future Enhancements & Roadmap
+
+12.1. Future Enhancements
+*   **NLP Query Interface (Enhanced Chatbot):** Deeper "Chat with Data" capabilities, allowing natural language queries for complex data exploration and ad-hoc reporting.
+*   **Auto Recommendations & Prescriptions:** More sophisticated AI-driven proactive recommendations and automated campaign triggers.
+*   **Embedded Insights via API:** Allow third-party applications or internal tools to consume AI-driven insights directly through APIs.
+*   **Customizable Dashboards:** Allow users to tailor dashboard views and create custom reports.
+*   **Scenario Planning & Simulation:** Advanced tools for modeling the impact of different retention strategies.
+
+12.2. Future Integrations
+The platform will integrate with key enterprise systems for both data ingestion and pushing recommendations:
+*   CRM Systems (e.g., Salesforce, HubSpot)
+*   Marketing Automation Platforms (e.g., Marketo, Pardot)
+*   Customer Support Systems (e.g., Zendesk, ServiceNow)
+*   Data Warehouses / Data Lakes (e.g., Snowflake, Databricks)
+
+12.3. Beyond MVP Roadmap
+*   **Beta Testing:** Expand prototype to a limited set of internal and external users for feedback.
+*   **Full Production Deployment:** Roll out the complete feature set with robust AI-driven recommendations.
+*   **Performance Optimization:** Continuous fine-tuning of pipelines, models, and UI for speed and efficiency.
+*   **Continuous Enhancement:** Regularly add new analytics, integrations, and predictive capabilities based on user feedback and market trends.
+*   **Cost Optimization:** Implement reserved instances and serverless optimizations for scaled environments.
+
+## Technology Stack
+# TECHSTACK - A.U.R.A
+
+This document outlines the core technologies, frameworks, databases, and tools recommended for the A.U.R.A project, a cloud-managed AI platform designed to ingest and process data, apply AI models for forecasting and decision-making, and deliver business insights through dashboards. The focus for the MVP/hackathon is on building a functional prototype that demonstrates the end-to-end flow, with a particular emphasis on the AI chatbot and data processing.
+
+## 1. Cloud & Infrastructure
+
+**Strategy:** A hybrid model is adopted, where AI models are installed locally on client servers to ensure data security and privacy (sensitive client data remains on-premises). A cloud backend, preferably on AWS, will handle model management, updates, monitoring, and orchestration without directly processing sensitive client data.
+
+**Cloud Provider:**
+*   **Amazon Web Services (AWS):** Preferred cloud provider for its comprehensive suite of services, scalability, and robust security features.
+    *   **Justification:** Supports the vision of a cloud-managed platform, providing flexibility for future enhancements and scalability.
+
+**Core Cloud Services (AWS):**
+*   **AWS Lambda (Serverless Functions):** For lightweight, event-driven orchestration of model updates, metadata handling, and API endpoints.
+    *   **Justification:** Cost-effective "pay-per-use" model, ideal for MVP and tasks that don"t require always-on compute. Automatically scales based on demand.
+*   **AWS ECS / EKS (Container Orchestration):** For managing containerized services and updates, both for cloud backend components and packaging AI models for consistent local deployment on client servers.
+    *   **Justification:** Ensures consistent runtime environments, simplifies deployment, and facilitates updates across hybrid infrastructure.
+*   **AWS API Gateway:** To securely expose management endpoints for the cloud backend, ensuring controlled and authenticated access to services.
+    *   **Justification:** Provides a single entry point for APIs, handles authentication, authorization, and rate limiting, enhancing security and manageability.
+*   **AWS CloudWatch / CloudTrail:** For monitoring deployment status, system health, audit trails, and data lineage of cloud components.
+    *   **Justification:** Essential for operational visibility, debugging, and maintaining compliance.
+
+**MVP Hosting:**
+*   **Streamlit Cloud:** For hosting the initial frontend dashboard prototype.
+    *   **Justification:** Offers free, quick deployment for Streamlit applications, enabling rapid demonstration of the MVP.
+
+## 2. Data Processing & Storage
+
+The platform adheres to "The Medallion data hierarchy" (Bronze, Silver, Gold) to ensure data quality, consistency, and optimized access for various applications.
+
+**2.1. Bronze Layer (Raw Data)**
+*   **Purpose:** Landing zone for raw, immutable data ingested from source systems. Preserves fidelity and traceability.
+*   **Storage (MVP):**
+    *   **Local File System (`./uploads`):** For static or sample datasets during MVP, simulating initial data ingestion.
+    *   **(Future/Scaled) AWS S3:** For scalable, cost-effective raw data storage in the cloud environment.
+    *   **Justification:** S3 offers high durability, availability, and scalability for storing vast amounts of raw data, while the local file system suffices for MVP.
+*   **Ingestion:** Python scripts for initial static/sample dataset loading.
+    *   **(Future) Data Processing Pipeline:** Batch or stream processing for various data sources (customer demographics, transaction history, engagement logs, support data, surveys, external data).
+    *   **Justification:** Captures all raw data for future processing and comprehensive analytics.
+
+**2.2. Silver Layer (Cleansed & Enriched Data)**
+*   **Purpose:** Clean, validate, standardize, and join raw data for consistent analysis.
+*   **Tools & Libraries:**
+    *   **`pandas` & `numpy`:** Core Python libraries for data loading, cleaning, standardization, joining, and creating derived metrics (e.g., engagement scores, average transaction value, churn indicators).
+    *   **`scikit-learn.ColumnTransformer`, `scikit-learn.Pipeline`:** For robust and reproducible feature preprocessing, handling various data transformations.
+    *   **Justification:** Industry-standard libraries for efficient in-memory data manipulation and robust preprocessing pipelines, ensuring data quality and consistency.
+
+**2.3. Gold Layer (Business-Level Aggregates & Curated Datasets)**
+*   **Purpose:** Provide ready-to-use datasets for dashboards, AI models, and reporting.
+*   **Tools & Libraries:**
+    *   **`pandas`:** For aggregation, scoring (e.g., client health scores), risk flagging (e.g., retention risk), and extensive feature engineering for AI models.
+    *   **Justification:** Facilitates the creation of high-value, business-ready datasets tailored for specific analytics, AI applications, and reporting, reducing query complexity.
+*   **Storage (MVP):**
+    *   **Local File System / In-memory:** For MVP, curated datasets will primarily reside in memory or as local files for dashboard and AI model input.
+    *   **(Future/Scaled) Managed Databases / Data Warehouses (e.g., AWS RDS, Amazon Redshift):** For persistent storage of aggregated data and optimized analytical queries.
+    *   **Justification:** Optimized for query performance and direct consumption by business intelligence tools and AI models.
+
+**2.4. Data Exploration & Quality Analysis**
+*   **`sweetviz`:** An open-source Python library for automated exploratory data analysis (EDA) and target variable analysis.
+    *   **Justification:** Generates quick, comprehensive data analysis reports, aiding in understanding data quality, distributions, and relationships early in the development cycle.
+
+## 3. Artificial Intelligence & Machine Learning
+
+**3.1. AI/ML Models**
+*   **Core Libraries:**
+    *   **`scikit-learn`:** A comprehensive machine learning library for classification, regression, clustering, and dimensionality reduction.
+    *   **`xgboost`:** An optimized distributed gradient boosting library, known for its performance and accuracy in structured data.
+    *   **Justification:** These are industry-leading libraries for building robust and scalable AI models.
+*   **Forecasting (MVP):**
+    *   **`Prophet` (from Meta):** A robust forecasting procedure for univariate time series data, specifically designed for business forecasting.
+    *   **Justification:** Provides a user-friendly and effective solution for the simple forecasting model required in the MVP.
+*   **Decision Engine (MVP):**
+    *   **Rule-based Engine (Python-driven):** Custom logic based on predefined rules using client data (engagement, NPS, support interactions, contract timelines) to identify churn risk, suggest retention strategies, and highlight upsell opportunities.
+    *   **Justification:** Enables a clear, auditable, and quickly implementable decision-making system for the MVP.
+*   **Model Persistence:**
+    *   **`joblib`:** A library for persisting Python objects, especially numerical arrays and functions.
+    *   **Justification:** Efficiently saves and loads trained AI models, crucial for deployment and updates.
+
+**3.2. AI Chatbot**
+*   **Purpose (MVP Focus):** To help users quickly interpret and explore curated Gold layer data, and guide retention strategy selection and simulation based on predictive insights, making data actionable.
+*   **Underlying Technologies:** Leveraging the AI/ML models mentioned above (e.g., for sentiment analysis on feedback, predictive insights) and potentially NLP libraries for query understanding. For MVP, initial logic can be rule-based or integrate with simple language models.
+    *   **Justification:** Designed as a strategic partner to bridge AI insights with practical retention actions, enhancing platform actionability.
+
+**3.3. AutoML (Hackathon/MVP Boost)**
+*   **Hugging Face AutoTrain:** A free, hosted AutoML platform.
+    *   **Justification:** Allows for super-quick model training from a CSV, providing an API endpoint which is excellent for rapid prototyping and hackathons.
+
+## 4. Frontend & User Interface
+
+**4.1. Responsive Web Application (Dashboard)**
+*   **Framework (MVP):**
+    *   **`streamlit`:** A Python library that turns data scripts into shareable web apps.
+    *   **Justification:** Enables rapid development of interactive data applications and dashboards with minimal frontend expertise, perfect for MVP and hackathons. Integrates seamlessly with Python data science stack.
+*   **Dashboarding / Business Intelligence (MVP):**
+    *   **Power BI / Looker Studio:** For basic KPIs and quick visualization of aggregated Gold layer data.
+    *   **Justification:** Cloud-native, user-friendly tools that allow for quick creation and sharing of interactive dashboards.
+*   **Visualization Libraries (Optional, within Streamlit):**
+    *   **`matplotlib` & `plotly`:** For creating custom and interactive charts and graphs.
+    *   **Justification:** Provide powerful capabilities for generating high-quality visualizations to present trends, correlations, and insights.
+
+## 5. Security & Governance (Lightweight for MVP)
+
+**Key Considerations (Ongoing):**
+*   **IAM & Role-Based Access:** Implementing granular permissions for users and services (e.g., AWS IAM).
+*   **Audit Trails & Data Lineage:** Tracking data access, modifications, and system events (e.g., AWS CloudTrail, custom logging solutions).
+*   **Data Encryption & Key Management:** Encrypting data at rest and in transit, managing encryption keys (e.g., AWS KMS for cloud, client-side encryption).
+    *   **Justification:** These foundational security practices are crucial for protecting sensitive client data and maintaining compliance, even if implemented iteratively.
+
+## 6. Performance & Scalability Targets
+
+The chosen technologies are intended to support the following performance and scalability goals:
+
+*   **Concurrent User Load:**
+    *   MVP: 50–200 concurrent users.
+    *   Production: 500–2,000+ concurrent users.
+    *   **Justification:** Backend services, APIs, and database queries will be optimized with load balancing and horizontal scaling where applicable (e.g., AWS Lambda, ECS).
+*   **Data Processing Latency:**
+    *   Dashboard Data Refresh: 1–5 minutes for near-real-time; up to 15–30 minutes for non-critical analytics.
+    *   **Justification:** Leverages incremental ETL, micro-batch processing, and caching of frequently accessed KPIs (e.g., Redis, Memcached).
+*   **AI Model Inference Performance:**
+    *   Local AI Models: <500 ms for real-time decisions; 1–2 seconds for batch scoring.
+    *   Rule-Based Engine: <200–500 ms per client evaluation.
+    *   **Justification:** Local execution minimizes latency for sensitive client data and high-frequency scoring. Optimized model serving ensures timely insights.
+*   **Chatbot / Interactive AI Performance:**
+    *   Response Time: <1 second for local AI interactions; <2 seconds if cloud orchestration is involved.
+    *   **Justification:** Critical for a natural and efficient user experience, achieved through optimized context retrieval and autoscaling of chatbot services.
+*   **Overall System Scalability:**
+    *   **Horizontal Scalability:** Backend APIs, databases, and orchestration layers designed to scale out.
+    *   **High Availability:** Production architecture will include failover, redundancy, and multi-AZ deployment for cloud components.
+    *   **Justification:** Ensures the platform can handle increasing data volumes and user demands without performance degradation, maintaining business continuity.
+
+## 7. Development & Auxiliary Tools
+
+*   **File Uploads / Outputs (MVP):** Local folder (`./uploads`, `./models`)
+    *   **Justification:** Simple, direct approach for local MVP development and testing.
+*   **Database (Optional for MVP):** Skipped for now.
+    *   **Justification:** Simplifies the MVP scope, focusing on file-based persistence and in-memory data processing with `pandas`. Future iterations will incorporate managed databases.
+*   **Version Control:** Git / GitHub
+    *   **Justification:** Standard for collaborative software development, ensuring code integrity and change tracking.
+
+## Project Structure
+aura/
+├── .github/
+│   └── workflows/
+│       └── main.yml
+├── docs/
+│   └── README.md
+│   └── architecture.md
+│   └── projectStructure.md
+├── notebooks/
+│   └── 01_eda_sweetviz.ipynb
+│   └── 02_model_experimentation.ipynb
+│   └── 03_chatbot_poc.ipynb
+├── data/
+│   ├── bronze/
+│   │   └── raw_customer_demographics.csv
+│   │   └── raw_transactions.csv
+│   │   └── raw_engagement_logs.csv
+│   ├── silver/
+│   │   └── customer_profiles.parquet
+│   │   └── transaction_summaries.parquet
+│   │   └── engagement_summaries.parquet
+│   ├── gold/
+│   │   └── customer_health_scores.parquet
+│   │   └── dashboard_kpis.parquet
+│   │   └── ai_model_features.parquet
+│   └── temp/
+│       └── uploaded_data.csv
+├── src/
+│   ├── config/
+│   │   └── settings.py
+│   │   └── constants.py
+│   ├── data_pipeline/
+│   │   └── ingest.py
+│   │   └── silver_transform.py
+│   │   └── gold_agg.py
+│   │   └── orchestrator.py
+│   ├── models/
+│   │   ├── forecasting/
+│   │   │   └── prophet_model.py
+│   │   │   └── trained_prophet_model.joblib
+│   │   ├── decision_engine/
+│   │   │   └── rules_engine.py
+│   │   ├── chatbot/
+│   │   │   └── chatbot_core.py
+│   │   │   └── nlp_utils.py
+│   │   │   └── knowledge_base.py
+│   │   │   └── trained_chatbot_model.joblib
+│   │   └── model_manager.py
+│   ├── dashboard/
+│   │   └── app.py
+│   │   ├── components/
+│   │   │   └── client_dashboard.py
+│   │   │   └── retention_strategies.py
+│   │   │   └── chatbot_interface.py
+│   │   └── utils/
+│   │       └── data_loader.py
+│   │       └── plot_utils.py
+│   ├── tests/
+│   │   ├── unit/
+│   │   │   └── test_data_pipeline.py
+│   │   │   └── test_models.py
+│   │   └── integration/
+│   │       └── test_e2e_flow.py
+├── .gitignore
+├── requirements.txt
+├── Dockerfile
+└── README.md
+
+
+### Folder Explanations:
+
+**`aura/`**
+The root directory of the A.U.R.A project, containing all project-related files and subdirectories.
+
+**`.github/`**
+Contains GitHub Actions workflows for continuous integration and deployment. For the MVP, this sets up foundational automation.
+- **`workflows/`**: Stores `.yml` files defining CI/CD pipelines.
+  - **`main.yml`**: A sample workflow for automated testing, linting, and potential deployment triggers upon code pushes or pull requests.
+
+**`docs/`**
+Comprehensive project documentation, providing detailed information about the project's various aspects.
+- **`README.md`**: A high-level project overview, including purpose, how to run, and key features.
+- **`architecture.md`**: Details the overall system architecture, outlining the hybrid cloud/local approach and the interaction between components.
+- **`projectStructure.md`**: This document itself, detailing the file and folder organization of the A.U.R.A project.
+
+**`notebooks/`**
+Dedicated to Jupyter notebooks used for exploratory data analysis (EDA), model experimentation, and initial proof-of-concepts.
+- **`01_eda_sweetviz.ipynb`**: Notebook for initial data exploration and quality analysis using the `sweetviz` library, generating comprehensive data reports.
+- **`02_model_experimentation.ipynb`**: Notebooks for trying out different AI models, such as Prophet for forecasting, `scikit-learn` models, or `xgboost` for classification, to identify the best performers.
+- **`03_chatbot_poc.ipynb`**: A proof-of-concept notebook for the AI chatbot's core logic, including natural language processing (NLP) components and interaction flows.
+
+**`data/`**
+Local storage for data at various stages of the Medallion data hierarchy, crucial for the data processing pipeline. For the MVP, these folders simulate persistent storage.
+- **`bronze/`**: The raw data landing zone. Stores immutable, unprocessed data directly from source systems (e.g., CSV uploads, initial data dumps) to maintain data fidelity and traceability.
+  - **`raw_customer_demographics.csv`**: Raw customer information as ingested.
+  - **`raw_transactions.csv`**: Raw transactional data with all original fields.
+  - **`raw_engagement_logs.csv`**: Raw user interaction logs, often high-volume and semi-structured.
+- **`silver/`**: Contains cleansed, standardized, and enriched data. Data in this layer is consistent, validated, and often joined from multiple bronze sources, ready for more complex analysis.
+  - **`customer_profiles.parquet`**: Cleansed customer profiles with initial aggregated metrics.
+  - **`transaction_summaries.parquet`**: Standardized and summarized transaction data, e.g., grouped by customer or time.
+  - **`engagement_summaries.parquet`**: Processed and aggregated engagement logs, suitable for feature engineering.
+- **`gold/`**: Stores business-ready, highly aggregated, and curated data specifically prepared for AI models, dashboards, and executive reporting. This layer is optimized for consumption.
+  - **`customer_health_scores.parquet`**: Aggregated client health scores and risk levels, derived from silver layer data.
+  - **`dashboard_kpis.parquet`**: Final Key Performance Indicators (KPIs) aggregated and optimized for dashboard display.
+  - **`ai_model_features.parquet`**: Features explicitly engineered and formatted for direct input into AI model training and inference.
+- **`temp/`**: A temporary storage location for uploaded files (e.g., via the Streamlit dashboard) or intermediate processing outputs that do not need to be persisted long-term in the Medallion layers.
+  - **`uploaded_data.csv`**: An example of a file temporarily stored after a user upload.
+
+**`src/`**
+Contains all the core source code for the A.U.R.A application, structured into logical modules.
+- **`config/`**: Holds application-wide configuration files and constant definitions.
+  - **`settings.py`**: Stores application settings, environment variables, and placeholder cloud configurations (even if simplified for MVP).
+  - **`constants.py`**: Defines global constants, fixed values, magic strings, and thresholds used consistently across the application.
+- **`data_pipeline/`**: Scripts responsible for orchestrating the data flow through the Bronze, Silver, and Gold layers of the Medallion architecture.
+  - **`ingest.py`**: Handles the initial loading of raw data into the Bronze layer from various sources.
+  - **`silver_transform.py`**: Implements data cleansing, standardization, deduplication, and enrichment logic to transform data from Bronze to Silver.
+  - **`gold_agg.py`**: Performs further aggregation, feature engineering, and KPI calculation to create business-ready datasets in the Gold layer from Silver data.
+  - **`orchestrator.py`**: The main script to trigger and manage the entire data processing pipeline, ensuring data moves correctly through the layers.
+- **`models/`**: Houses all AI models, rule-based decision engines, and chatbot components.
+  - **`forecasting/`**: Contains code and trained artifacts for client churn or engagement forecasting models.
+    - **`prophet_model.py`**: Implements the Prophet forecasting model, as identified in the MVP scope.
+    - **`trained_prophet_model.joblib`**: A persisted (saved) instance of the trained Prophet model, ready for inference, stored using `joblib`.
+  - **`decision_engine/`**: Logic for the rule-based decision engine, crucial for automated decision-making and recommendations.
+    - **`rules_engine.py`**: Contains the business rules and logic for identifying churn risk, suggesting targeted retention strategies, and highlighting upsell opportunities based on Gold layer data.
+  - **`chatbot/`**: Core components of the AI chatbot, which is the primary focus for the hackathon MVP.
+    - **`chatbot_core.py`**: The main logic for the chatbot, including natural language understanding (NLU) for intent recognition and natural language generation (NLG) for response generation.
+    - **`nlp_utils.py`**: Utility functions for natural language processing tasks such as text cleaning, tokenization, and embedding.
+    - **`knowledge_base.py`**: Structured data, pre-defined responses, or rules that enable the chatbot to interpret Gold layer data and guide strategy selection, making insights actionable.
+    - **`trained_chatbot_model.joblib`**: (Optional) A persisted NLP model (e.g., an intent classifier or named entity recognizer) if applicable for the chatbot's functionality.
+  - **`model_manager.py`**: A utility script for loading, saving, and managing different versions of AI models, ensuring easy deployment and updates.
+- **`dashboard/`**: The Streamlit web application that serves as the frontend and user interface for A.U.R.A.
+  - **`app.py`**: The main Streamlit application file, orchestrating the layout and integration of various dashboard components.
+  - **`components/`**: Modular Streamlit components for different sections and functionalities of the dashboard.
+    - **`client_dashboard.py`**: Renders the client monitoring dashboard with key performance indicators (KPIs) and interactive visualizations.
+    - **`retention_strategies.py`**: Displays selected retention strategies, allowing users to explore and simulate their impact.
+    - **`chatbot_interface.py`**: Integrates the AI chatbot directly into the dashboard, providing an interactive query interface for data and strategies.
+  - **`utils/`**: Helper functions specific to the dashboard to keep `app.py` clean.
+    - **`data_loader.py`**: Functions to load and prepare data from the Gold layer for display within the dashboard.
+    - **`plot_utils.py`**: Contains functions for generating various charts, graphs, and visualizations using libraries like `matplotlib` or `plotly`.
+- **`tests/`**: Contains unit and integration tests to ensure code quality and functionality.
+  - **`unit/`**: Unit tests for individual functions and classes.
+    - **`test_data_pipeline.py`**: Tests for data processing steps and transformations within the `data_pipeline` module.
+    - **`test_models.py`**: Tests for AI model logic, inference, and potentially training components.
+  - **`integration/`**: Integration tests to verify interactions between different modules or end-to-end flows.
+    - **`test_e2e_flow.py`**: Tests the complete flow from data ingestion through AI processing to dashboard display.
+
+**`.gitignore`**
+Specifies intentionally untracked files and directories that Git should ignore, such as virtual environments, compiled files, and sensitive data.
+
+**`requirements.txt`**
+Lists all Python dependencies required for the project, allowing easy installation of the project's environment.
+
+**`Dockerfile`**
+(Optional for MVP, but good practice for deployment) Defines how to build a Docker image for the application, enabling consistent environments across development and deployment.
+
+**`README.md`**
+The top-level project README, typically containing setup instructions, usage guides, and a comprehensive project overview.
+
+## Database Schema Design
+Database Schema Design for A.U.R.A.
+
+This document details the logical database schema for the A.U.R.A. project, structured according to the Medallion Data Architecture (Bronze, Silver, Gold layers). This approach ensures data quality, traceability, and optimal readiness for analytical reporting, AI model training, and real-time decision-making. While the Minimum Viable Product (MVP) may initially utilize file-based storage (e.g., local CSVs, in-memory pandas DataFrames) due to its "skip database for now" directive, this schema is designed to be fully compatible with a scalable cloud-based data lakehouse environment (e.g., AWS S3 + Spark/Databricks, or a managed data warehouse like Google BigQuery or Snowflake) for future scalability and persistence.
+
+---
+
+### 1. Medallion Data Hierarchy Overview
+
+*   **Bronze Layer:** The raw data landing zone. It holds immutable, unprocessed data directly ingested from source systems. This layer preserves the original fidelity and enables complete data lineage and re-processing capabilities.
+*   **Silver Layer:** The cleansed and enriched data layer. Data here is cleaned, validated, standardized, and integrated from various Bronze sources. It forms the foundation for consistent analytical views and initial derived metrics.
+*   **Gold Layer:** The aggregated, business-ready data layer. Optimized for specific business use cases, dashboards, AI model inputs, and reporting. This layer is designed for performance and ease of use by end-user applications and business analysts.
+
+---
+
+### 2. Bronze Layer: Raw Data (Landing Zone)
+
+**Purpose:** To store raw, immutable data exactly as it is ingested from source systems. This layer is critical for data governance, auditability, and the ability to re-process data from its original state.
+
+**Key Design Principles:**
+*   **Immutability:** Data, once written, is never modified.
+*   **Fidelity:** Preserves the original format and structure from source systems.
+*   **Metadata Capture:** Each record includes metadata like `ingestion_timestamp` and `source_system`.
+*   **Schema-on-Read:** Flexible schema to accommodate semi-structured or evolving source data.
+
+**Proposed Entities (Logical Tables/Data Collections):**
+
+1.  **`bronze_customers_raw`**
+    *   `customer_id` (VARCHAR): Original unique identifier for the customer.
+    *   `source_system_customer_id` (VARCHAR): ID specific to the source system.
+    *   `first_name` (VARCHAR)
+    *   `last_name` (VARCHAR)
+    *   `email` (VARCHAR)
+    *   `phone_number` (VARCHAR)
+    *   `age` (INT)
+    *   `gender` (VARCHAR)
+    *   `country` (VARCHAR)
+    *   `city` (VARCHAR)
+    *   `subscription_type` (VARCHAR): e.g., "Premium", "Basic", "Enterprise".
+    *   `account_creation_date` (DATETIME)
+    *   `status` (VARCHAR): e.g., "Active", "Inactive", "Churned", "Trial".
+    *   `source_system` (VARCHAR): Origin of data, e.g., "CRM_Salesforce", "Customer_Portal".
+    *   `ingestion_timestamp` (DATETIME): Timestamp when the record was loaded into Bronze.
+    *   `raw_json_payload` (TEXT/JSONB): Optional, for capturing the full original raw payload.
+
+2.  **`bronze_transactions_raw`**
+    *   `transaction_id` (VARCHAR): Unique identifier for the transaction.
+    *   `customer_id` (VARCHAR): Foreign key reference to the customer.
+    *   `transaction_date` (DATETIME)
+    *   `amount` (DECIMAL)
+    *   `currency` (VARCHAR)
+    *   `payment_method` (VARCHAR): e.g., "Credit Card", "PayPal", "Bank Transfer".
+    *   `product_id` (VARCHAR)
+    *   `product_name` (VARCHAR)
+    *   `quantity` (INT)
+    *   `transaction_type` (VARCHAR): e.g., "Purchase", "Refund", "Subscription Payment".
+    *   `source_system` (VARCHAR): Origin, e.g., "Billing_Platform", "ECommerce_API".
+    *   `ingestion_timestamp` (DATETIME)
+
+3.  **`bronze_engagement_events_raw`**
+    *   `event_id` (VARCHAR): Unique identifier for the event.
+    *   `customer_id` (VARCHAR): Foreign key reference to the customer.
+    *   `session_id` (VARCHAR): Identifier for a user session.
+    *   `event_type` (VARCHAR): e.g., "page_view", "button_click", "feature_usage", "login", "logout".
+    *   `event_timestamp` (DATETIME)
+    *   `device_type` (VARCHAR): e.g., "Desktop", "Mobile", "Tablet".
+    *   `browser` (VARCHAR)
+    *   `operating_system` (VARCHAR)
+    *   `page_url` (TEXT)
+    *   `feature_used` (VARCHAR): Specific application feature identifier.
+    *   `event_data_json` (TEXT/JSONB): Any additional event-specific metadata.
+    *   `source_system` (VARCHAR): Origin, e.g., "Web_Analytics", "App_Telemetry".
+    *   `ingestion_timestamp` (DATETIME)
+
+4.  **`bronze_support_interactions_raw`**
+    *   `ticket_id` (VARCHAR): Unique identifier for a support ticket or interaction.
+    *   `customer_id` (VARCHAR): Foreign key reference to the customer.
+    *   `interaction_type` (VARCHAR): e.g., "Chat", "Email", "Call", "Self-service".
+    *   `issue_type` (VARCHAR): e.g., "Bug Report", "Feature Request", "Billing Inquiry", "Technical Support".
+    *   `status` (VARCHAR): e.g., "Open", "In Progress", "Resolved", "Closed".
+    *   `created_at` (DATETIME)
+    *   `resolved_at` (DATETIME)
+    *   `agent_id` (VARCHAR): Identifier for the support agent.
+    *   `satisfaction_score` (INT): e.g., CSAT or a specific rating (1-5).
+    *   `transcript_text` (TEXT): Full text of chat/email conversations (crucial for chatbot context).
+    *   `source_system` (VARCHAR): Origin, e.g., "Zendesk", "Intercom", "LiveChat".
+    *   `ingestion_timestamp` (DATETIME)
+
+5.  **`bronze_feedback_surveys_raw`**
+    *   `survey_response_id` (VARCHAR): Unique identifier for the survey response.
+    *   `customer_id` (VARCHAR): Foreign key reference to the customer.
+    *   `response_date` (DATETIME)
+    *   `nps_score` (INT): Net Promoter Score (typically 0-10).
+    *   `comments` (TEXT): Free-text feedback or qualitative responses.
+    *   `question_id` (VARCHAR): If multiple questions in a survey.
+    *   `question_text` (TEXT): The actual question asked.
+    *   `response_text` (TEXT): Specific answer to a question (if not `comments`).
+    *   `survey_type` (VARCHAR): e.g., "NPS", "Product Feedback", "Onboarding Survey".
+    *   `source_system` (VARCHAR): Origin, e.g., "SurveyMonkey", "Qualtrics", "InApp_Survey".
+    *   `ingestion_timestamp` (DATETIME)
+
+**Relationships:** Primarily implicit links via `customer_id`. No strict referential integrity enforced at this raw stage.
+
+---
+
+### 3. Silver Layer: Cleansed & Enriched Data
+
+**Purpose:** To provide a reliable, consistent, and standardized view of the data. This layer involves rigorous cleaning, deduplication, standardization, and initial enrichment through intelligent joins and the calculation of derived metrics.
+
+**Key Design Principles:**
+*   **Data Quality:** Enforcement of data types, ranges, and formats; handling of missing or erroneous values.
+*   **Consistency:** Standardization of categorical values (e.g., "male" becomes "Male").
+*   **Integration:** Joining disparate Bronze datasets to create holistic views.
+*   **Derived Metrics:** Calculation of foundational analytical metrics.
+*   **Schema-on-Write:** Well-defined and enforced schema for all tables.
+
+**Proposed Entities (Logical Tables):**
+
+1.  **`silver_customer_dim`**
+    *   `customer_pk` (VARCHAR - Primary Key): A standardized, unique ID for the customer.
+    *   `source_customer_id` (VARCHAR): Original `customer_id` from the primary source.
+    *   `first_name` (VARCHAR)
+    *   `last_name` (VARCHAR)
+    *   `email_address` (VARCHAR)
+    *   `age_group` (VARCHAR): e.g., "18-24", "25-34", "65+".
+    *   `gender_standardized` (VARCHAR): "Male", "Female", "Other", "Unknown".
+    *   `country` (VARCHAR)
+    *   `region` (VARCHAR): Geographically derived from country.
+    *   `industry` (VARCHAR): e.g., "Retail", "Healthcare", "Tech" (if available).
+    *   `current_subscription_plan` (VARCHAR): Normalized plan name.
+    *   `account_creation_date` (DATE)
+    *   `last_active_date` (DATE): Derived from latest engagement or transaction.
+    *   `account_status_standardized` (VARCHAR): "Active", "Trial", "Churned", "Suspended".
+    *   `total_lifetime_revenue` (DECIMAL): Sum of all valid transactions.
+    *   `average_transaction_value` (DECIMAL)
+    *   `total_support_tickets_lifetime` (INT)
+    *   `avg_satisfaction_score_lifetime` (DECIMAL)
+    *   `most_recent_nps_score` (INT)
+    *   `data_last_processed_at` (DATETIME): Timestamp for when this Silver record was last updated.
+
+2.  **`silver_transaction_facts_daily`**
+    *   `transaction_date` (DATE - Primary Key part)
+    *   `customer_pk` (VARCHAR - Primary Key part, Foreign Key to `silver_customer_dim`)
+    *   `total_revenue_daily` (DECIMAL)
+    *   `total_transactions_daily` (INT)
+    *   `distinct_products_purchased_daily` (INT)
+    *   `avg_item_price_daily` (DECIMAL)
+    *   `refund_count_daily` (INT)
+
+3.  **`silver_engagement_facts_daily`**
+    *   `event_date` (DATE - Primary Key part)
+    *   `customer_pk` (VARCHAR - Primary Key part, Foreign Key to `silver_customer_dim`)
+    *   `daily_active_events_count` (INT)
+    *   `daily_sessions_count` (INT)
+    *   `avg_session_duration_minutes_daily` (DECIMAL)
+    *   `distinct_features_used_daily` (INT)
+    *   `total_page_views_daily` (INT)
+    *   `total_login_events_daily` (INT)
+
+4.  **`silver_support_facts_monthly`**
+    *   `month_start_date` (DATE - Primary Key part, first day of the month)
+    *   `customer_pk` (VARCHAR - Primary Key part, Foreign Key to `silver_customer_dim`)
+    *   `tickets_opened_monthly` (INT)
+    *   `tickets_resolved_monthly` (INT)
+    *   `avg_resolution_time_hours_monthly` (DECIMAL)
+    *   `avg_satisfaction_score_monthly` (DECIMAL)
+    *   `negative_sentiment_tickets_monthly` (INT): Derived from NLP on `transcript_text`.
+
+5.  **`silver_feedback_facts`**
+    *   `survey_response_pk` (VARCHAR - Primary Key): Unique identifier for processed survey response.
+    *   `customer_pk` (VARCHAR - Foreign Key to `silver_customer_dim`)
+    *   `response_date` (DATE)
+    *   `nps_score` (INT)
+    *   `comment_sentiment_score` (DECIMAL): Ranging from -1 (Negative) to 1 (Positive).
+    *   `key_themes_extracted` (ARRAY/JSONB): e.g., ["Billing Issue", "Feature Request", "Customer Service"].
+
+**Relationships:**
+*   `silver_customer_dim` serves as the central dimension table, linked to all other `silver_*_facts` tables via `customer_pk`.
+
+---
+
+### 4. Gold Layer: Business-Ready Data
+
+**Purpose:** To provide highly aggregated, curated datasets optimized for specific downstream applications, including dashboards, AI model training and inference, and the AI chatbot. This layer prioritizes performance, ease of consumption, and business-specific semantics.
+
+**Key Design Principles:**
+*   **Application-Specific:** Tailored for dashboard KPIs, AI model features, or chatbot context.
+*   **Performance Optimized:** Often denormalized, pre-joined, and pre-calculated for fast querying.
+*   **Business Language:** Metrics and attributes are named and structured to align with business terminology.
+*   **AI-Ready:** Features explicitly structured for direct consumption by AI/ML models.
+
+**Proposed Entities (Logical Tables):**
+
+1.  **`gold_customer_360_dashboard_view`**
+    *   `customer_pk` (VARCHAR - Primary Key)
+    *   `customer_name` (VARCHAR)
+    *   `email_address` (VARCHAR)
+    *   `subscription_plan` (VARCHAR)
+    *   `account_status` (VARCHAR)
+    *   `days_since_signup` (INT)
+    *   `current_health_score` (DECIMAL): Composite score (0-100) combining weighted metrics (engagement, support, revenue, NPS).
+    *   `churn_risk_level` (VARCHAR): "High", "Medium", "Low" (output from the rule-based decision engine and/or AI model).
+    *   `predicted_churn_probability` (DECIMAL): Probability from the AI churn prediction model (e.g., 0.0-1.0).
+    *   `recommended_action` (VARCHAR): e.g., "Schedule Proactive Call", "Offer Retention Discount", "Send Educational Content".
+    *   `upsell_opportunity_flag` (BOOLEAN): Indication of potential upsell (from AI/rules).
+    *   `cross_sell_opportunity_flag` (BOOLEAN)
+    *   `last_active_date` (DATE)
+    *   `MRR_current_month` (DECIMAL): Monthly Recurring Revenue.
+    *   `YOY_MRR_growth_percentage` (DECIMAL)
+    *   `avg_engagement_score_90d` (DECIMAL): Average engagement score over the last 90 days.
+    *   `last_nps_score` (INT)
+    *   `open_support_tickets_count` (INT)
+    *   `client_segment` (VARCHAR): e.g., "SMB", "Enterprise", "High-Value", "New Customer".
+    *   `dashboard_data_last_refreshed_at` (DATETIME)
+
+2.  **`gold_overall_kpi_dashboard_view`**
+    *   `report_date` (DATE - Primary Key)
+    *   `total_active_clients` (INT)
+    *   `new_clients_count_daily` (INT)
+    *   `churned_clients_count_daily` (INT)
+    *   `monthly_recurring_revenue_total` (DECIMAL)
+    *   `annual_recurring_revenue_total` (DECIMAL)
+    *   `overall_nps_average` (DECIMAL)
+    *   `overall_retention_rate_30d` (DECIMAL)
+    *   `overall_engagement_index` (DECIMAL)
+    *   `top_churn_reasons_summary` (TEXT/JSONB): e.g., `[{"reason": "High Price", "count": 120}, {"reason": "Missing Feature", "count": 80}]`.
+    *   `top_performing_strategies_summary` (TEXT/JSONB): Summarized outcomes of retention strategies.
+
+3.  **`gold_ai_model_features_for_churn_prediction`**
+    *   `customer_pk` (VARCHAR - Primary Key part)
+    *   `feature_snapshot_date` (DATE - Primary Key part): Date for which these features were computed.
+    *   `feature_avg_daily_active_events_90d` (DECIMAL)
+    *   `feature_total_transaction_value_60d` (DECIMAL)
+    *   `feature_support_tickets_30d_count` (INT)
+    *   `feature_days_since_last_login` (INT)
+    *   `feature_last_nps_score` (INT)
+    *   `feature_churn_history_365d_flag` (BOOLEAN): Has the customer churned in the past year?
+    *   `feature_subscription_plan_tier` (INT): Numeric encoding of the subscription plan.
+    *   `feature_age_of_account_days` (INT)
+    *   `target_churned_next_30d` (BOOLEAN): The target variable for model training (customer churned within the next 30 days).
+
+4.  **`gold_ai_chatbot_context`**
+    *   `customer_pk` (VARCHAR - Primary Key)
+    *   `context_last_updated_at` (DATETIME)
+    *   `curated_client_summary` (TEXT): A concise, AI-generated summary of the client's current status, key historical events, and overall health.
+    *   `key_insights_last_month` (TEXT): Summarized notable changes or events (e.g., "Engagement dropped significantly", "New high-value transaction").
+    *   `relevant_playbook_strategies` (TEXT/JSONB): A list of `strategy_id`s and short descriptions applicable to this client's profile from `gold_retention_playbook_strategies_dim`.
+    *   `historical_churn_factors_for_segment` (TEXT): Common reasons for churn identified within the client's segment.
+    *   `recent_support_issues_summary` (TEXT): Brief overview of recent support interactions, including sentiment and resolution status.
+    *   `recommended_proactive_questions` (TEXT/JSONB): AI-generated suggestions for questions the chatbot might ask the user.
+    *   `last_support_transcript_snippet` (TEXT): A brief snippet from the most recent support interaction transcript for quick context.
+
+5.  **`gold_retention_playbook_strategies_dim`**
+    *   `strategy_id` (VARCHAR - Primary Key)
+    *   `strategy_name` (VARCHAR)
+    *   `description` (TEXT)
+    *   `target_customer_segment` (VARCHAR): e.g., "High-Risk SMB", "Low-Engagement Enterprise".
+    *   `trigger_conditions_json` (TEXT/JSONB): Formalized rules or conditions that suggest this strategy.
+    *   `expected_outcome` (TEXT): e.g., "Reduce churn by X%", "Increase upsell conversion".
+    *   `estimated_cost_per_client` (DECIMAL)
+    *   `implementation_guidance` (TEXT)
+    *   `is_active` (BOOLEAN)
+
+**Relationships:**
+*   `gold_customer_360_dashboard_view` serves as the core for client-level insights, directly feeding the dashboard.
+*   `gold_ai_model_features_for_churn_prediction` is derived from `silver_customer_dim` and aggregated `silver_*_facts` tables, specifically structured for AI model training and inference.
+*   `gold_ai_chatbot_context` draws its data from `gold_customer_360_dashboard_view`, `gold_retention_playbook_strategies_dim`, and potentially summarized Silver layer data to provide rich conversational context.
+*   `gold_retention_playbook_strategies_dim` is a reference table for the decision engine and the chatbot, providing structured information about available strategies.
+
+---
+
+### 5. Data Flow and Transformation Summary
+
+*   **Bronze Ingestion:** Raw, unsanitized data from CRM, Billing, Web Analytics, Customer Support, and Survey platforms is loaded into their respective Bronze tables. This process captures full fidelity, including timestamps and source metadata.
+*   **Bronze → Silver Transformation (ETL/ELT Pipeline):**
+    *   **Data Quality:** Automated processes handle nulls, duplicates, data type mismatches, and format inconsistencies.
+    *   **Standardization:** Categorical values are harmonized (e.g., "Male" instead of "male", "M").
+    *   **Enrichment & Integration:** Different Bronze tables are joined using `customer_id` to create comprehensive customer profiles and aggregated facts (e.g., linking customer demographics with their engagement events). Basic NLP might extract sentiment from `transcript_text` and `comments`.
+    *   **Derived Metrics:** Initial, foundational metrics such as `total_lifetime_revenue`, `avg_transaction_value`, and daily/monthly activity counts are calculated.
+*   **Silver → Gold Transformation (Feature Engineering & Business Logic):**
+    *   **Dashboard KPIs:** Silver layer aggregates are further transformed and combined to produce high-level KPIs and client-specific summary metrics for the `gold_overall_kpi_dashboard_view` and `gold_customer_360_dashboard_view`.
+    *   **AI Feature Engineering:** Complex feature engineering processes combine various Silver layer facts and dimensions to create the predictive features required for AI models (e.g., `feature_avg_daily_active_events_90d`, `feature_days_since_last_login`).
+    *   **AI Model Inference & Decision Engine Output:** The results from the AI models (e.g., `predicted_churn_probability`) and the rule-based decision engine (e.g., `churn_risk_level`, `recommended_action`) are written into `gold_customer_360_dashboard_view` for immediate business consumption.
+    *   **Chatbot Context Generation:** Specific summaries, key insights, and relevant playbook strategies are extracted and pre-computed for the `gold_ai_chatbot_context` table, optimizing chatbot response times and relevance.
+
+---
+
+## User Flow
+This document outlines the core user flows for A.U.R.A, a cloud-managed AI platform designed to help businesses monitor clients, predict churn, and optimize retention strategies. Focusing on the MVP scope and the AI Chatbot as a hackathon priority, these flows detail how Account Managers and Retention Specialists interact with the system to gain insights and drive action.
+
+WIREFRANE DESCRIPTIONS (for reference within User Flows):
+
+Dashboard Screen:
+    - Header: A.U.R.A Logo, User Profile (e.g., "John Doe, Account Manager"), Main Navigation (Dashboard, Playbook, Chatbot).
+    - Executive Summary Panel: Top section displaying high-level KPIs like "Overall Client Health Score," "Avg. Churn Risk %," "Engagement Trend," "MRR Growth." Includes summary charts (e.g., sparklines) and quick indicators.
+    - Filters Panel: Left or top bar with dropdowns/selectors for "Date Range," "Client Tier," "Industry," "Region," etc., allowing segmentation and exploration of data.
+    - Client List/Table: Central, interactive table displaying client names, "Health Score," "Churn Risk %," "Last Engaged Date," "Recommended Action." It is sortable, searchable, and highlights anomalies.
+    - Client Detail Modal/Panel: Opens upon clicking a client row. Shows granular client data, specific AI-driven recommendations, detailed churn risk factors, and quick action buttons (e.g., "Mark as Reviewed," "Schedule Call").
+    - Charts/Visualizations Panel: Area with interactive charts for "Engagement Over Time," "Cohort Retention," "Feature Adoption Heatmap," "Revenue Trends," providing clear visual patterns and correlations.
+
+Chatbot Interface:
+    - Persistent Chat Window/Overlay: Typically an icon that expands into a side panel or modal, accessible from any screen.
+    - Chat History: Area displaying conversational turns, chatbot responses (text, embedded micro-charts, lists, links to deeper insights).
+    - Input Field: Text area for user to type queries, supporting natural language.
+    - Contextual Quick Action Buttons: Dynamic buttons that appear below chatbot responses, offering common follow-up actions (e.g., "Show me more details," "Simulate strategy," "View client dashboard," "Add to task list").
+
+Playbook Screen:
+    - Header: Same as Dashboard.
+    - Strategy Categories/Filters: Side panel or top bar to filter strategies (e.g., "Churn Prevention," "Upsell," "Onboarding," "Engagement Boost").
+    - Strategy List: Cards or list items, each showing "Strategy Name," "Brief Description," "Target Client Profile," "Expected Outcome," and a "View Details" button.
+    - Strategy Detail View: Dedicated page or modal for a selected strategy, providing comprehensive details, step-by-step guidance, required resources, and potential metrics to track.
+
+---
+
+USER FLOW 1: Monitoring Clients & Acting on AI Recommendations
+
+USER GOAL: Account Manager proactively identifies at-risk clients, understands the underlying reasons, and plans targeted interventions using the A.U.R.A dashboard.
+
+USER ROLE: Account Manager / Retention Specialist
+
+PRE-CONDITIONS:
+    - User is logged into A.U.R.A.
+    - Data has been ingested (Bronze), cleansed (Silver), and aggregated into business-ready insights (Gold layer).
+    - AI models (forecasting, rule-based decision engine) have processed the Gold layer data, generating client health scores, churn risks, and actionable recommendations.
+
+STEPS:
+
+1.  USER ACTION: Access Dashboard.
+    SYSTEM RESPONSE: The A.U.R.A Dashboard loads, displaying the default view of all clients for the past 30 days.
+    UI/WIREFRAME: Dashboard Screen.
+    INTERACTION: Initial page load after successful login.
+
+2.  USER ACTION: View Executive Summary.
+    SYSTEM RESPONSE: The "Executive Summary Panel" at the top of the dashboard presents high-level KPIs (e.g., "Overall Client Health Score," "Avg. Churn Risk %," "Engagement Trend," "MRR Growth"), providing a quick snapshot of client health and business performance.
+    UI/WIREFRAME: Dashboard Screen, Executive Summary Panel.
+    INTERACTION: Passive viewing, information absorption.
+
+3.  USER ACTION: Identify High-Risk Clients.
+    SYSTEM RESPONSE: User scans the "Client List/Table" for clients with critical indicators, such as a high "Churn Risk %" or low "Health Score." User sorts the table by 'Churn Risk %' in descending order to prioritize.
+    UI/WIREFRAME: Dashboard Screen, Client List/Table.
+    INTERACTION: Click on a table header to sort.
+
+4.  USER ACTION: Filter Clients by Specific Criteria.
+    SYSTEM RESPONSE: User applies filters from the "Filters Panel" (e.g., 'Industry: SaaS', 'Client Tier: Enterprise') to narrow down the client list and focus on a specific segment. The dashboard's KPIs and client list update to reflect the filtered data.
+    UI/WIREFRAME: Dashboard Screen, Filters Panel, Client List/Table, Executive Summary Panel.
+    INTERACTION: Select values from dropdowns, apply filters.
+
+5.  USER ACTION: Review Specific Client Recommendations & Details.
+    SYSTEM RESPONSE: User clicks on a specific high-risk client (e.g., "Client X") from the filtered list. A "Client Detail Modal/Panel" opens, displaying granular data points (e.g., recent engagement patterns, support ticket history, specific feature usage) and AI-generated "Recommended Action" for Client X (e.g., "Offer proactive training session," "Schedule follow-up call with Account Manager," "Propose feature Y based on usage gaps"). This recommendation is derived from the rule-based decision engine, showing the data behind the decision.
+    UI/WIREFRAME: Dashboard Screen, Client Detail Modal/Panel.
+    INTERACTION: Click on a client row in the Client List/Table.
+
+6.  USER ACTION: Analyze Trends & Visualizations.
+    SYSTEM RESPONSE: User navigates to the "Charts/Visualizations Panel" to examine overall engagement trends, MRR changes, or cohort retention over time for the selected client segment or overall, confirming the insights from the client list.
+    UI/WIREFRAME: Dashboard Screen, Charts/Visualizations Panel.
+    INTERACTION: View charts, interact with chart legends/tooltips, possibly apply date range changes.
+
+7.  USER ACTION: Decide and Log Action (MVP Manual).
+    SYSTEM RESPONSE: Based on the insights from the dashboard and recommendations, the user decides on an intervention (e.g., "Email client X with a customized offer," "Schedule a follow-up call"). In the MVP, this might involve manually logging the action or using a simple "Mark as Reviewed" button in the Client Detail Modal.
+    UI/WIREFRAME: Dashboard Screen, Client Detail Modal/Panel (with a button like "Mark as Reviewed" or "Log Action").
+    INTERACTION: Click an action button, close the modal.
+
+OVERALL INTERACTION PATTERNS:
+    - Data Table Interactions: Sorting, filtering, drill-down on rows.
+    - Filter/Facet Selection: Multi-select dropdowns, date pickers.
+    - Chart Interactions: Tooltips on hover, zoom, pan.
+    - Modal/Drawer Views: For detailed client information and actions.
+    - Progressive Disclosure: Starting with high-level KPIs and allowing drill-downs to granular data and recommendations.
+
+---
+
+USER FLOW 2: Exploring Data & Guiding Strategy with the AI Chatbot (Hackathon Focus)
+
+USER GOAL: Account Manager uses the AI Chatbot to quickly interpret specific client data, identify reasons for changes, and get guided recommendations for retention strategies, including simulation of their potential impact.
+
+USER ROLE: Account Manager / Retention Specialist
+
+PRE-CONDITIONS:
+    - User is logged into A.U.R.A.
+    - The Gold layer data is current and accessible.
+    - The AI Chatbot's NLP/NLU engine and the rule-based decision engine are active.
+
+STEPS:
+
+1.  USER ACTION: Access Chatbot.
+    SYSTEM RESPONSE: User clicks the "Chatbot" icon/link in the A.U.R.A navigation. The "Chatbot Interface" opens, ready for interaction.
+    UI/WIREFRAME: Chatbot Interface.
+    INTERACTION: Click chatbot icon/link.
+
+2.  USER ACTION: Initial Query - Data Interpretation.
+    SYSTEM RESPONSE: User types a question related to client data (e.g., "Show me engagement trend for Client Alpha in the last quarter," or "Which clients had a significant drop in NPS last month?"). The Chatbot processes the query against the curated Gold layer data, responds with a concise answer, and potentially includes a simplified chart or list of clients directly in the chat history.
+    UI/WIREFRAME: Chatbot Interface, Input Field, Chat History.
+    INTERACTION: Type text, press Enter.
+
+3.  USER ACTION: Follow-up Question - Detail Exploration & Root Cause Analysis.
+    SYSTEM RESPONSE: User asks a follow-up question for more detail or to understand the "why" (e.g., "What were the main features Client Alpha used least during that period?" or "Why did Client Beta's churn risk increase this week?"). The Chatbot provides deeper insights, potentially explaining factors influencing churn risk based on the rule-based decision engine (e.g., "Client Beta's churn risk increased due to reduced feature usage, a recent support ticket with low satisfaction score, and approaching contract renewal date."). It might offer related "Contextual Quick Action Buttons," such as "View Client Beta's detailed dashboard."
+    UI/WIREFRAME: Chatbot Interface, Chat History, Contextual Quick Action Buttons.
+    INTERACTION: Type text, press Enter, or click a quick action button.
+
+4.  USER ACTION: Strategy Guidance Request.
+    SYSTEM RESPONSE: User shifts focus to strategy by asking (e.g., "What retention strategies are recommended for clients like Client Gamma, who have low engagement and high support ticket volume?"). The Chatbot queries the internal playbook and decision engine. It presents 1-3 relevant strategies (e.g., "Strategy A: Proactive Check-in Program," "Strategy B: Feature Adoption Workshop"). For each, it provides a brief description, an estimated potential impact based on historical data/rules (e.g., "Strategy A could reduce churn by X% for similar client profiles."), and a link to the full playbook entry.
+    UI/WIREFRAME: Chatbot Interface, Chat History displaying strategy names, descriptions, estimated impacts, and links.
+    INTERACTION: Type text, press Enter.
+
+5.  USER ACTION: Strategy Simulation (MVP - Rule-based).
+    SYSTEM RESPONSE: User asks to simulate a strategy (e.g., "Simulate the impact of Strategy A on Client Gamma's churn risk"). The Chatbot uses the rule-based engine to show a hypothetical outcome (e.g., "Applying Strategy A to Client Gamma is projected to decrease their churn risk from 15% to 8% over the next month, based on similar past interventions."). It might highlight key factors that would change.
+    UI/WIREFRAME: Chatbot Interface, Chat History showing simulation results.
+    INTERACTION: Type text, press Enter.
+
+6.  USER ACTION: Accessing Playbook Details.
+    SYSTEM RESPONSE: User asks for more details on a recommended strategy (e.g., "Tell me more about 'Proactive Check-in Program'"). The Chatbot either provides a summary within the chat or a direct hyperlink to the full "Playbook Screen" entry for that specific strategy.
+    UI/WIREFRAME: Chatbot Interface with summary/link, or Playbook Screen if link is clicked.
+    INTERACTION: Type text, press Enter, or click a hyperlink.
+
+7.  USER ACTION: Concluding Interaction.
+    SYSTEM RESPONSE: User expresses satisfaction or closes the chatbot. The Chatbot offers further assistance or a polite closing message.
+    UI/WIREFRAME: Chatbot Interface.
+    INTERACTION: Type "Thank you" or close the chat window/overlay.
+
+OVERALL INTERACTION PATTERNS:
+    - Conversational Interface: Text input, displaying context-aware responses.
+    - Contextual Buttons: Quick actions dynamically offered based on current conversation state.
+    - Embedded Micro-Visualizations: Simple charts/lists integrated directly into chat responses for quick data interpretation.
+    - Hyperlinks: Seamless navigation to other parts of the A.U.R.A application (e.g., client dashboard, playbook) for deeper exploration.
+
+## Styling Guidelines
+STYLING GUIDELINES: A.U.R.A
+
+1.  **Introduction & Design Philosophy**
+
+    These styling guidelines define the visual language for the A.U.R.A platform, ensuring a cohesive, intuitive, and professional user experience across all touchpoints, including dashboards, the AI chatbot, and other UI elements. Our design philosophy is rooted in:
+
+    *   **Clarity & Readability:** Presenting complex data and AI insights in an easily digestible format, minimizing cognitive load. Every visual element should serve a purpose and enhance understanding.
+    *   **Actionability:** Guiding users toward proactive decision-making. The design should highlight key insights, risks, and opportunities, prompting clear next steps for client retention and engagement.
+    *   **Trust & Professionalism:** Reflecting the advanced AI capabilities and the sensitive nature of client data. The visual design should instill confidence and reliability.
+    *   **Efficiency & Automation:** Streamlining user workflows by providing a clean, uncluttered interface that allows users to quickly find information and execute tasks.
+    *   **Modern & Intuitive:** Aligning with A.U.R.A's identity as a cutting-edge, cloud-managed AI platform. The interface should feel contemporary and be easy to learn and navigate.
+    *   **Data Empathy:** Humanizing data presentation, making trends and patterns immediately recognizable and relevant to user goals.
+
+2.  **Brand Identity & Visual Language**
+
+    The visual language of A.U.R.A should convey a tone that is:
+
+    *   **Intelligent & Analytical:** Through clean layouts, precise typography, and well-structured data visualizations.
+    *   **Reliable & Secure:** Via a grounded color palette and robust, consistent UI components.
+    *   **Proactive & Insightful:** By using accent colors for alerts, recommendations, and calls to action.
+    *   **Modern & Sophisticated:** Leveraging contemporary design elements and a refined aesthetic.
+
+3.  **Color Palette**
+
+    The A.U.R.A color palette is designed to be professional, clean, and purposeful, using color to convey information and guide user attention without distraction.
+
+    *   **Primary Brand Colors:**
+        *   **A.U.R.A Blue (Deep):** `#004D7A` (RGB: 0, 77, 122) - Core brand identity, primary actions, prominent UI elements.
+        *   **A.U.R.A Blue (Light):** `#E0EFF7` (RGB: 224, 239, 247) - Backgrounds, secondary containers, subtle highlights.
+
+    *   **Secondary/Accent Colors:**
+        *   **A.U.R.A Teal:** `#00B3B3` (RGB: 0, 179, 179) - Call-to-action buttons, interactive elements, key data points in charts.
+        *   **A.U.R.A Orange:** `#FF8C00` (RGB: 255, 140, 0) - Secondary accents, less critical highlights.
+
+    *   **Neutral Colors:**
+        *   **Dark Gray (Text):** `#333333` (RGB: 51, 51, 51) - Primary body text, headings.
+        *   **Medium Gray (Borders/Icons):** `#666666` (RGB: 102, 102, 102) - Secondary text, icons, borders.
+        *   **Light Gray (Backgrounds):** `#F8F8F8` (RGB: 248, 248, 248) - Default background for content areas.
+        *   **Off-White:** `#FFFFFF` (RGB: 255, 255, 255) - Card backgrounds, main page backgrounds.
+
+    *   **Semantic Colors (Data & Status):**
+        *   **Success (Green):** `#28A745` (RGB: 40, 167, 69) - Positive trends, healthy clients, successful actions.
+        *   **Warning (Yellow/Orange):** `#FFC107` (RGB: 255, 193, 7) - At-risk clients, pending actions, moderate issues.
+        *   **Error (Red):** `#DC3545` (RGB: 220, 53, 69) - Churn risk (high), critical errors, negative trends.
+        *   **Information (Light Blue):** `#17A2B8` (RGB: 23, 162, 184) - General information, tips, neutral data points.
+
+    *   **Usage Guidelines:** Colors should be used sparingly and purposefully. Reserve accent colors for interactive elements and key data highlights. Maintain sufficient contrast for accessibility.
+
+4.  **Typography**
+
+    Typography in A.U.R.A prioritizes readability and clear information hierarchy.
+
+    *   **Font Family:** `Lato`, a modern sans-serif font, is selected for its clean lines and excellent readability across various screen sizes. Fallback fonts include `Arial`, `sans-serif`.
+
+    *   **Hierarchy & Scale:**
+        *   **H1 (Page Titles):** 2.5rem (40px) - Bold.
+        *   **H2 (Section Titles):** 2rem (32px) - Bold.
+        *   **H3 (Card Titles/Sub-sections):** 1.5rem (24px) - Medium.
+        *   **H4 (Widget Titles):** 1.25rem (20px) - Medium.
+        *   **Body Text:** 1rem (16px) - Regular.
+        *   **Subtitle/Lead Text:** 1.125rem (18px) - Regular.
+        *   **Caption/Small Text:** 0.875rem (14px) - Regular.
+        *   **Data Labels/Tooltips:** 0.75rem (12px) - Regular.
+
+    *   **Weights:**
+        *   Light (for subtle text, not primary content).
+        *   Regular (for body text).
+        *   Medium (for emphasis, some headings).
+        *   Bold (for strong emphasis, primary headings, key metrics).
+
+    *   **Line Height & Letter Spacing:**
+        *   Line height for body text should be `1.5` to ensure comfortable reading.
+        *   Line height for headings can be slightly tighter, around `1.2`.
+        *   Letter spacing should be kept to `normal` or `0.01em` for optimal readability.
+
+5.  **Iconography**
+
+    Icons provide visual cues, improve navigation, and enhance comprehension without adding clutter.
+
+    *   **Style:** Icons should be `line-based` or `filled` with a consistent stroke weight and rounded corners for a modern, friendly yet professional feel.
+    *   **Purpose:** Used for navigation, action buttons, status indicators, feature representation, and to support data visualization.
+    *   **Source/Library:** `Material Icons` or `Font Awesome` are recommended for consistency and broad coverage. Custom icons may be designed for unique A.U.R.A specific concepts.
+    *   **Size & Color:** Icons should scale appropriately with text or component size. Default color is `Medium Gray (#666666)`, changing to `A.U.R.A Blue (Deep)` or `A.U.R.A Teal` on hover/active states or to convey meaning (e.g., semantic colors for status).
+
+6.  **Layout & Spacing**
+
+    A consistent layout and spacing system ensures a structured, clean, and harmonious interface.
+
+    *   **Grid System:** A `12-column responsive grid` should be utilized to ensure flexible and adaptable layouts across various screen sizes.
+    *   **Spacing Units:** All margins, padding, and gaps between elements will adhere to an `8px base unit`. This creates a consistent visual rhythm.
+        *   Small: 8px
+        *   Medium: 16px
+        *   Large: 24px
+        *   X-Large: 32px
+    *   **Information Density:** Balance information-rich sections with adequate white space to reduce visual fatigue and highlight key content. Group related content logically within cards or distinct sections.
+
+7.  **UI Component Guidelines (General)**
+
+    *   **Buttons:**
+        *   **Primary:** `A.U.R.A Teal` background, white text. Used for main actions.
+        *   **Secondary:** White background, `A.U.R.A Blue (Deep)` border and text. Used for less critical actions.
+        *   **Tertiary/Ghost:** Transparent background, `A.U.R.A Blue (Deep)` text. Used for subtle actions or navigation.
+        *   States: Clear visual indication for `hover`, `focus`, `active`, and `disabled` states.
+    *   **Input Fields & Forms:**
+        *   Clean, minimalistic design with clear labels above or beside the input field.
+        *   Placeholder text should be helpful but not redundant.
+        *   Validation messages (error, success) should be immediately visible and clear.
+        *   Default state: Light gray border, white background. Focus state: `A.U.R.A Blue (Deep)` border.
+    *   **Cards & Containers:**
+        *   Used to group related information and provide visual separation.
+        *   Typically `Off-White` backgrounds with subtle shadows or borders.
+        *   Consistent padding and spacing within cards.
+    *   **Tables:**
+        *   Designed for readability of large datasets.
+        *   Clear, distinguishable headers (`Medium Gray` background or `Bold` text).
+        *   Alternating row colors (`Off-White` and `Light Gray`) to improve scanning.
+        *   Interactive elements (sorting, filtering, pagination) should be intuitive.
+    *   **Navigation:**
+        *   Global navigation should be consistent across the platform.
+        *   Clear hover and active states for menu items.
+        *   Use icons to supplement text where appropriate.
+
+8.  **Data Visualization & Dashboard Principles**
+
+    Given A.U.R.A's data-intensive nature, visualization principles are paramount. These apply to both Streamlit dashboards and Power BI/Looker Studio reports.
+
+    *   **Clarity & Focus:**
+        *   Avoid "chart junk" – unnecessary visual elements that distract from the data.
+        *   Charts should have a single, clear message or answer a specific question.
+        *   Minimalist design with appropriate use of white space.
+    *   **Consistency:**
+        *   Use the `A.U.R.A color palette` consistently across all visualizations. Semantic colors should always represent the same meaning (e.g., red for churn risk).
+        *   Consistent chart types for similar data comparisons or trends.
+        *   Standardized axis labels, legends, and tooltips.
+    *   **Actionable Highlighting:**
+        *   Leverage semantic colors (`Warning`, `Error`) to highlight anomalies, risks (e.g., at-risk clients), or opportunities.
+        *   Use annotations or small alert icons to draw attention to critical data points.
+    *   **Appropriate Chart Selection:**
+        *   **Trends over Time:** Line charts, area charts, sparklines.
+        *   **Comparisons:** Bar charts, column charts.
+        *   **Distributions:** Histograms, box plots.
+        *   **Correlations:** Scatter plots.
+        *   **Flows/Progression:** Funnel charts (e.g., client onboarding, upsell journeys).
+        *   **Geographic Data:** Geographic maps for client distribution.
+        *   **Engagement/Intensity:** Heatmaps.
+        *   **Cohort Analysis:** Dedicated cohort charts for retention and behavior.
+    *   **Dashboard Structure (Information Hierarchy):**
+        *   **Top Section:** Executive summary with high-level KPIs, key alerts, and trend indicators for a quick snapshot of client health and business performance.
+        *   **Middle Section:** Detailed insights through interactive charts and visualizations, allowing deeper exploration, segmentation, and drill-downs (by region, industry, client tier, product, date range).
+        *   **Bottom Section:** Actionable items such as at-risk client lists, high-potential upsell opportunities, and notifications, with quick-action options.
+    *   **Interactivity:**
+        *   **Filters:** Allow users to segment and explore data (e.g., by region, industry, client tier).
+        *   **Drill-downs:** Provide access to client-level details from high-level KPIs.
+        *   **Date Range Selectors:** Support time-based comparisons.
+        *   **Tooltips:** Provide on-demand detail for data points.
+    *   **Streamlit Specifics:**
+        *   Utilize Streamlit's theming capabilities to align with the A.U.R.A color palette and typography.
+        *   Leverage `st.columns`, `st.expander`, `st.container` to maintain the defined layout and spacing.
+        *   Custom CSS can be used for granular styling control where Streamlit's native components fall short of requirements.
+    *   **Power BI / Looker Studio Specifics:**
+        *   Develop standardized report templates that enforce A.U.R.A's color palette, typography, and layout structure.
+        *   Educate report developers on best practices for chart selection, drill-throughs, and interactive filters to ensure consistency and actionability.
+        *   Ensure all reports adhere to the defined dashboard information hierarchy.
+
+9.  **AI Chatbot UI/UX Principles**
+
+    The AI chatbot is a strategic partner, guiding users to insights and actions. Its UI/UX should reflect its intelligence and utility.
+
+    *   **Conversational Flow:**
+        *   Natural language processing (NLP) should be supported by clear, concise responses.
+        *   The chatbot should proactively ask clarifying questions or offer suggestions to guide the user.
+    *   **Visual Feedback:**
+        *   Use typing indicators to show the chatbot is processing.
+        *   Differentiate user input from AI responses (e.g., different message bubble colors/alignment).
+        *   Clear "loading" states for data retrieval.
+    *   **Proactive Suggestions:**
+        *   Offer "quick replies" or suggested questions/actions based on the current context or identified user needs.
+        *   Example: "Show me top churn risks" or "Simulate impact of a discount."
+    *   **Data Integration:**
+        *   Seamlessly present data snippets, small charts, or direct links to relevant dashboard sections within the chat interface.
+        *   Recommendations (e.g., retention strategies) should be clearly presented and actionable, potentially with direct links to execute actions.
+    *   **Context Retention:** The chatbot should remember previous interactions to maintain a coherent conversation and avoid repetitive questions.
+    *   **Consistency with Brand:** The chatbot interface should integrate seamlessly with the overall A.U.R.A platform, using the defined color palette, typography, and iconography.
+
+10. **Accessibility**
+
+    A.U.R.A is committed to creating an accessible platform for all users.
+
+    *   **Color Contrast:** All text and essential UI elements must meet `WCAG AA standards` for color contrast.
+    *   **Keyboard Navigation:** All interactive elements (buttons, links, form fields) must be fully navigable and operable via keyboard.
+    *   **Screen Reader Support:** Use semantic HTML and ARIA attributes where necessary to ensure screen readers can accurately interpret and convey content.
+    *   **Focus States:** Provide clear visual focus indicators for interactive elements.
+    *   **Alternative Text:** Provide descriptive `alt text` for all meaningful images and icons.
+
+11. **Responsiveness**
+
+    The A.U.R.A responsive web application must provide an optimal experience across a range of devices and screen sizes.
+
+    *   **Fluid Layouts:** Utilize fluid grids and flexible images to adapt gracefully to different viewports.
+    *   **Breakpoints:** Define key breakpoints (e.g., mobile, tablet, desktop, large desktop) to optimize layouts for each device category.
+    *   **Prioritization:** On smaller screens, prioritize essential information and actions, potentially collapsing secondary content or navigation.
+    *   **Touch Targets:** Ensure interactive elements (buttons, links) have adequate touch target sizes (minimum 44x44px) for mobile users.
+    *   **Performance:** Optimize assets and code for fast loading times on mobile networks.

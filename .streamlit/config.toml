@@ -1,0 +1,50 @@
+# A.U.R.A (Adaptive User Retention Assistant) Streamlit Configuration
+# This file contains custom configuration for the A.U.R.A platform
+# to provide a modern, professional user experience
+
+[global]
+# Development settings
+developmentMode = false
+showErrorDetails = true
+
+[server]
+# Server configuration
+port = 8501
+address = "0.0.0.0"
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+# Browser settings
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
+
+[theme]
+# A.U.R.A Custom Theme
+primaryColor = "#667eea"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "Inter, sans-serif"
+
+[client]
+# Client-side settings
+showErrorDetails = true
+toolbarMode = "minimal"
+
+[runner]
+# Runner settings
+magicEnabled = true
+installTracer = false
+fixMatplotlib = true
+
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+[deprecation]
+# Deprecation warnings
+showPyplotGlobalUse = false

@@ -1,0 +1,177 @@
+# A.U.R.A - Development Docker Compose Configuration
+# This file provides a development-focused setup with hot reloading,
+# debugging tools, and development services
+
+version: '3.8'
+
+services:
+  # Main A.U.R.A Application with Development Features
+  aura-app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura-app-dev
+    ports:
+      - "8501:8501"  # Streamlit dashboard
+      - "5678:5678"  # Debugpy port for debugging
+    volumes:
+      # Mount source code for hot reloading
+      - ./src:/home/aura/app/src
+      - ./notebooks:/home/aura/app/notebooks
+      - ./data:/home/aura/app/data
+      - ./models:/home/aura/app/models
+      - ./uploads:/home/aura/app/uploads
+      - ./logs:/home/aura/app/logs
+      # Mount configuration files
+      - ./docker/streamlit/config.toml:/home/aura/.streamlit/config.toml
+    environment:
+      - PYTHONPATH=/home/aura/app/src
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=true
+      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    networks:
+      - aura-dev-network
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo 'Starting A.U.R.A in development mode...' &&
+        echo 'Installing development dependencies...' &&
+        pip install --user debugpy watchdog &&
+        echo 'Starting Streamlit with debug support...' &&
+        streamlit run src/dashboard/app.py 
+        --server.port=8501 
+        --server.address=0.0.0.0 
+        --server.headless=true 
+        --server.enableCORS=true 
+        --server.enableXsrfProtection=false
+        --server.runOnSave=true
+        --server.fileWatcherType=poll
+      "
+
+  # Jupyter Lab for Data Exploration and Model Development
+  jupyter-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    container_name: aura-jupyter-dev
+    ports:
+      - "8888:8888"  # Jupyter Lab
+      - "8889:8889"  # Jupyter Lab alternative port
+    volumes:
+      - ./notebooks:/home/aura/app/notebooks
+      - ./src:/home/aura/app/src
+      - ./data:/home/aura/app/data
+      - ./models:/home/aura/app/models
+      - ./uploads:/home/aura/app/uploads
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=aura-dev-token
+      - PYTHONPATH=/home/aura/app/src
+    networks:
+      - aura-dev-network
+    restart: unless-stopped
+
+  # Redis for Development (with persistence)
+  redis-dev:
+    image: redis:7-alpine
+    container_name: aura-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    networks:
+      - aura-dev-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+
+  # PostgreSQL for Development (with sample data)
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: aura-postgres-dev
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=aura_dev_db
+      - POSTGRES_USER=aura_dev_user
+      - POSTGRES_PASSWORD=aura_dev_password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-dev.sql:/docker-entrypoint-initdb.d/init-dev.sql
+      - ./docker/postgres/sample-data.sql:/docker-entrypoint-initdb.d/sample-data.sql
+    networks:
+      - aura-dev-network
+    restart: unless-stopped
+
+  # Data Pipeline Development Worker
+  data-worker-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aura-data-worker-dev
+    volumes:
+      - ./src:/home/aura/app/src
+      - ./data:/home/aura/app/data
+      - ./logs:/home/aura/app/logs
+    environment:
+      - PYTHONPATH=/home/aura/app/src
+      - REDIS_URL=redis://redis-dev:6379
+      - POSTGRES_URL=postgresql://aura_dev_user:aura_dev_password@postgres-dev:5432/aura_dev_db
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    networks:
+      - aura-dev-network
+    restart: unless-stopped
+    depends_on:
+      - redis-dev
+      - postgres-dev
+    command: >
+      sh -c "
+        echo 'Starting data pipeline worker in development mode...' &&
+        echo 'Installing development dependencies...' &&
+        pip install --user watchdog &&
+        echo 'Starting data pipeline with file watching...' &&
+        python -m watchdog src/data_pipeline/orchestrator.py
+      "
+
+  # Development Tools and Utilities
+  dev-tools:
+    image: ubuntu:22.04
+    container_name: aura-dev-tools
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      - aura-dev-network
+    restart: "no"
+    command: >
+      sh -c "
+        echo 'Installing development tools...' &&
+        apt-get update &&
+        apt-get install -y git curl wget vim nano htop tree jq &&
+        echo 'Development tools ready!' &&
+        tail -f /dev/null
+      "
+
+# Named volumes for development
+volumes:
+  redis-dev-data:
+    driver: local
+  postgres-dev-data:
+    driver: local
+
+# Development network
+networks:
+  aura-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
