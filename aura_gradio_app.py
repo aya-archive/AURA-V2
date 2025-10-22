@@ -10,17 +10,29 @@ from datetime import datetime, timedelta
 import json
 import sys
 import os
+import logging
 
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
+# Import all A.U.R.A components
 from src.dashboard.utils.data_loader import DashboardDataLoader
 from src.dashboard.utils.plot_utils import DashboardPlotUtils
+from src.data_pipeline.orchestrator import DataPipelineOrchestrator
+from src.models.forecasting.prophet_model import ProphetForecastingModel
+from src.models.decision_engine.rules_engine import RuleBasedDecisionEngine
 from src.config.settings import settings
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize A.U.R.A components
 data_loader = DashboardDataLoader()
 plot_utils = DashboardPlotUtils()
+pipeline_orchestrator = DataPipelineOrchestrator()
+prophet_model = ProphetForecastingModel()
+decision_engine = RuleBasedDecisionEngine()
 
 # Global variables for data storage
 customer_data = pd.DataFrame()
@@ -37,7 +49,7 @@ def load_aura_data():
             data_loaded = True
             return "✅ Data loaded from A.U.R.A pipeline successfully!"
     except Exception as e:
-        print(f"Pipeline data not available: {e}")
+        logger.warning(f"Pipeline data not available: {e}")
     
     # Fallback to sample data
     np.random.seed(42)
@@ -58,6 +70,158 @@ def load_aura_data():
     
     data_loaded = True
     return "✅ Sample data generated successfully!"
+
+def run_data_pipeline():
+    """Run the complete A.U.R.A data pipeline."""
+    try:
+        logger.info("Starting A.U.R.A data pipeline execution")
+        results = pipeline_orchestrator.run_complete_pipeline()
+        
+        if results.get('overall_success', False):
+            return f"✅ Pipeline completed successfully!\n\n**Results:**\n- Bronze Records: {results['statistics']['bronze_records']:,}\n- Silver Records: {results['statistics']['silver_records']:,}\n- Gold Records: {results['statistics']['gold_records']:,}\n- Duration: {results['duration']:.2f} seconds"
+        else:
+            return f"⚠️ Pipeline completed with warnings.\n\n**Errors:** {len(results.get('errors', []))}\n**Warnings:** {len(results.get('warnings', []))}"
+    except Exception as e:
+        logger.error(f"Pipeline execution failed: {e}")
+        return f"❌ Pipeline failed: {str(e)}"
+
+def generate_forecast(metric_type, periods):
+    """Generate forecasts using Prophet model."""
+    if not data_loaded or customer_data.empty:
+        return None, "No data loaded. Please load data first."
+    
+    try:
+        # Create sample time series data for demonstration
+        dates = pd.date_range(start='2023-01-01', end='2024-01-01', freq='D')
+        
+        if metric_type == "Revenue":
+            values = np.random.lognormal(8, 1, len(dates)) + np.sin(np.arange(len(dates)) * 2 * np.pi / 365) * 1000
+        elif metric_type == "Engagement":
+            values = np.random.uniform(0, 1, len(dates)) + np.sin(np.arange(len(dates)) * 2 * np.pi / 30) * 0.2
+        else:  # Customer Count
+            values = np.random.normal(500, 50, len(dates)) + np.sin(np.arange(len(dates)) * 2 * np.pi / 365) * 100
+        
+        # Prepare data for Prophet
+        ts_data = pd.DataFrame({
+            'ds': dates,
+            'y': np.clip(values, 0, None)  # Ensure positive values
+        })
+        
+        # Train Prophet model
+        prophet_model.train_model(ts_data)
+        
+        # Generate forecast
+        forecast = prophet_model.generate_forecast(periods=int(periods))
+        
+        # Create visualization
+        fig = prophet_model.create_forecast_visualization(forecast, ts_data)
+        
+        # Get insights
+        insights = prophet_model.get_forecast_insights(forecast)
+        
+        insights_text = f"""
+        **Forecast Insights for {metric_type}:**
+        
+        - **Forecast Periods:** {insights['forecast_summary']['total_periods']}
+        - **Growth Rate:** {insights['forecast_summary']['growth_rate']:.2f}%
+        - **Current Value:** {insights['forecast_summary']['current_value']:.2f}
+        - **Forecasted Value:** {insights['forecast_summary']['forecasted_value']:.2f}
+        
+        **Recommendations:**
+        {chr(10).join(f"- {rec}" for rec in insights['recommendations'])}
+        """
+        
+        return fig, insights_text
+        
+    except Exception as e:
+        logger.error(f"Forecast generation failed: {e}")
+        return None, f"❌ Forecast generation failed: {str(e)}"
+
+def analyze_customer_risk(customer_id):
+    """Analyze customer risk using decision engine."""
+    if not data_loaded or customer_data.empty:
+        return "No data loaded. Please load data first."
+    
+    if not customer_id:
+        return "Please enter a customer ID."
+    
+    try:
+        # Find customer
+        customer = customer_data[customer_data['customer_id'] == customer_id]
+        if customer.empty:
+            return f"Customer {customer_id} not found."
+        
+        customer_info = customer.iloc[0]
+        
+        # Analyze risk using decision engine
+        risk_analysis = decision_engine.analyze_customer_risk(customer_info)
+        
+        # Generate recommendations
+        recommendations = decision_engine.generate_recommendations(risk_analysis, customer_info)
+        
+        analysis_text = f"""
+        ## Customer Risk Analysis: {customer_info['name']}
+        
+        **Customer ID:** {customer_info['customer_id']}
+        **Risk Level:** {risk_analysis['risk_level']}
+        **Risk Score:** {risk_analysis['composite_risk_score']:.3f}
+        **Confidence:** {risk_analysis['confidence']}
+        
+        **Key Risk Factors:**
+        {chr(10).join(f"- {factor}: {score:.3f}" for factor, score in risk_analysis['risk_factors'].items())}
+        
+        **Priority:** {recommendations['priority']}
+        **Timeline:** {recommendations['timeline']}
+        **Expected Outcome:** {recommendations['expected_outcome']}
+        
+        **Recommended Actions:**
+        {chr(10).join(f"- {action}" for action in recommendations['recommended_actions'])}
+        
+        **Required Resources:**
+        {chr(10).join(f"- {resource}" for resource in recommendations['resources_required'])}
+        """
+        
+        return analysis_text
+        
+    except Exception as e:
+        logger.error(f"Risk analysis failed: {e}")
+        return f"❌ Risk analysis failed: {str(e)}"
+
+def process_customer_batch():
+    """Process all customers using decision engine."""
+    if not data_loaded or customer_data.empty:
+        return pd.DataFrame(), "No data loaded. Please load data first."
+    
+    try:
+        # Process customer batch
+        results = decision_engine.process_customer_batch(customer_data)
+        
+        # Generate summary
+        summary = decision_engine.get_decision_summary(results)
+        
+        summary_text = f"""
+        **Decision Engine Summary:**
+        
+        - **Total Customers:** {summary['total_customers']:,}
+        - **High Risk:** {summary['high_risk_customers']:,}
+        - **Critical Priority:** {summary['critical_priority_customers']:,}
+        - **Average Risk Score:** {summary['average_risk_score']:.3f}
+        
+        **Risk Distribution:**
+        {chr(10).join(f"- {level}: {count}" for level, count in summary['risk_distribution'].items())}
+        
+        **Priority Distribution:**
+        {chr(10).join(f"- {priority}: {count}" for priority, count in summary['priority_distribution'].items())}
+        
+        **Key Insights:**
+        {chr(10).join(f"- {insight}" for insight in summary['insights'])}
+        """
+        
+        return results, summary_text
+        
+    except Exception as e:
+        logger.error(f"Batch processing failed: {e}")
+        return pd.DataFrame(), f"❌ Batch processing failed: {str(e)}"
 
 def get_metrics():
     """Get key metrics for the dashboard."""
@@ -324,10 +488,16 @@ with gr.Blocks(
             # Data loading section
             with gr.Row():
                 load_btn = gr.Button("🔄 Load A.U.R.A Data", variant="primary")
+                pipeline_btn = gr.Button("⚙️ Run Data Pipeline", variant="secondary")
                 status_text = gr.Textbox(label="Status", interactive=False)
             
             load_btn.click(
                 load_aura_data,
+                outputs=[status_text]
+            )
+            
+            pipeline_btn.click(
+                run_data_pipeline,
                 outputs=[status_text]
             )
             
@@ -412,6 +582,70 @@ with gr.Blocks(
             strategies_btn.click(
                 get_retention_strategies,
                 outputs=[retention_strategies]
+            )
+        
+        # Forecasting Tab
+        with gr.Tab("📈 Forecasting"):
+            gr.Markdown("## AI-Powered Forecasting with Prophet")
+            
+            with gr.Row():
+                metric_type = gr.Dropdown(
+                    choices=["Revenue", "Engagement", "Customer Count"],
+                    label="Metric to Forecast",
+                    value="Revenue"
+                )
+                periods = gr.Slider(
+                    minimum=7,
+                    maximum=365,
+                    value=30,
+                    step=1,
+                    label="Forecast Periods (Days)"
+                )
+                forecast_btn = gr.Button("🔮 Generate Forecast", variant="primary")
+            
+            forecast_plot = gr.Plot(label="Forecast Visualization")
+            forecast_insights = gr.Markdown(label="Forecast Insights")
+            
+            forecast_btn.click(
+                generate_forecast,
+                inputs=[metric_type, periods],
+                outputs=[forecast_plot, forecast_insights]
+            )
+        
+        # Risk Analysis Tab
+        with gr.Tab("⚠️ Risk Analysis"):
+            gr.Markdown("## AI-Powered Risk Analysis")
+            
+            with gr.Row():
+                risk_customer_id = gr.Textbox(
+                    label="Customer ID",
+                    placeholder="Enter customer ID (e.g., CUST_0001)",
+                    scale=2
+                )
+                analyze_risk_btn = gr.Button("🔍 Analyze Risk", variant="primary", scale=1)
+            
+            risk_analysis = gr.Markdown(label="Risk Analysis Results")
+            
+            analyze_risk_btn.click(
+                analyze_customer_risk,
+                inputs=[risk_customer_id],
+                outputs=[risk_analysis]
+            )
+            
+            # Batch processing section
+            gr.Markdown("### Batch Risk Analysis")
+            batch_btn = gr.Button("📊 Process All Customers", variant="secondary")
+            
+            batch_results = gr.Dataframe(
+                label="Batch Analysis Results",
+                interactive=False,
+                wrap=True
+            )
+            batch_summary = gr.Markdown(label="Batch Analysis Summary")
+            
+            batch_btn.click(
+                process_customer_batch,
+                outputs=[batch_results, batch_summary]
             )
         
         # AI Assistant Tab
