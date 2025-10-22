@@ -22,427 +22,440 @@ from src.config.settings import settings
 data_loader = DashboardDataLoader()
 plot_utils = DashboardPlotUtils()
 
-def load_sample_data():
-    """Load sample customer data."""
+# Global variables for data storage
+customer_data = pd.DataFrame()
+data_loaded = False
+
+def load_aura_data():
+    """Load A.U.R.A data from pipeline or generate sample data."""
+    global customer_data, data_loaded
+    
+    try:
+        # Try to load from Gold layer first
+        customer_data = data_loader.load_customer_360_data()
+        if not customer_data.empty:
+            data_loaded = True
+            return "✅ Data loaded from A.U.R.A pipeline successfully!"
+    except Exception as e:
+        print(f"Pipeline data not available: {e}")
+    
+    # Fallback to sample data
     np.random.seed(42)
     n_customers = 500
     
-    data = pd.DataFrame({
+    customer_data = pd.DataFrame({
         'customer_id': [f'CUST_{i:04d}' for i in range(1, n_customers + 1)],
         'name': [f'Customer {i}' for i in range(1, n_customers + 1)],
         'segment': np.random.choice(['SMB', 'Medium-Value', 'High-Value'], n_customers, p=[0.5, 0.3, 0.2]),
         'subscription_plan': np.random.choice(['Basic', 'Standard', 'Premium', 'Enterprise'], n_customers, p=[0.3, 0.4, 0.2, 0.1]),
-        'health_score': np.clip(np.random.normal(60, 20, n_customers), 0, 100),
-        'churn_risk': np.random.choice(['Low', 'Medium', 'High'], n_customers, p=[0.6, 0.3, 0.1]),
-        'lifetime_revenue': np.random.lognormal(8, 1, n_customers),
+        'current_health_score': np.clip(np.random.normal(60, 20, n_customers), 0, 100),
+        'churn_risk_level': np.random.choice(['Low', 'Medium', 'High'], n_customers, p=[0.6, 0.3, 0.1]),
+        'total_lifetime_revenue': np.random.lognormal(8, 1, n_customers),
         'engagement_score': np.random.uniform(0, 1, n_customers),
-        'last_activity_days': np.random.randint(1, 90, n_customers)
+        'days_since_last_engagement': np.random.randint(1, 90, n_customers),
+        'total_support_tickets_lifetime': np.random.poisson(3, n_customers)
     })
     
-    return data
-
-def load_aura_data():
-    """Load data from A.U.R.A data pipeline."""
-    try:
-        customer_data = data_loader.load_customer_360_data()
-        if not customer_data.empty:
-            return customer_data
-    except Exception as e:
-        print(f"Error loading A.U.R.A data: {e}")
-    
-    # Fallback to sample data
-    return load_sample_data()
+    data_loaded = True
+    return "✅ Sample data generated successfully!"
 
 def get_metrics():
-    """Get key metrics."""
-    data = load_aura_data()
+    """Get key metrics for the dashboard."""
+    if not data_loaded or customer_data.empty:
+        return "No data loaded", "No data loaded", "No data loaded", "No data loaded"
     
-    total_customers = len(data)
-    high_risk = len(data[data['churn_risk'] == 'High'])
-    avg_health = data['health_score'].mean()
-    total_revenue = data['lifetime_revenue'].sum()
+    total_customers = len(customer_data)
+    high_risk = len(customer_data[customer_data.get('churn_risk_level', '') == 'High'])
+    avg_health = customer_data.get('current_health_score', pd.Series([0])).mean()
+    total_revenue = customer_data.get('total_lifetime_revenue', pd.Series([0])).sum()
     
-    return f"""
-    📊 **Dashboard Overview**
-    
-    **Total Customers:** {total_customers:,}
-    **High Risk Customers:** {high_risk:,} ({high_risk/total_customers*100:.1f}%)
-    **Average Health Score:** {avg_health:.1f}/100
-    **Total Lifetime Revenue:** ${total_revenue:,.0f}
-    """
+    return (
+        f"{total_customers:,}",
+        f"{high_risk:,}",
+        f"{avg_health:.1f}",
+        f"${total_revenue:,.0f}"
+    )
 
-def create_risk_chart():
-    """Create risk distribution chart."""
-    data = load_aura_data()
-    risk_counts = data['churn_risk'].value_counts()
+def create_risk_distribution_chart():
+    """Create risk distribution pie chart."""
+    if not data_loaded or customer_data.empty:
+        return None
     
+    risk_data = customer_data.get('churn_risk_level', customer_data.get('churn_risk', ''))
+    if risk_data.empty:
+        return None
+    
+    risk_counts = risk_data.value_counts()
     fig = px.pie(
         values=risk_counts.values,
         names=risk_counts.index,
         title="Customer Risk Distribution",
         color_discrete_sequence=['#28a745', '#ffc107', '#dc3545']
     )
-    
-    fig.update_layout(height=400, showlegend=True)
+    fig.update_layout(
+        title_font_size=16,
+        font=dict(size=12)
+    )
     return fig
 
-def create_health_chart():
-    """Create health score chart."""
-    data = load_aura_data()
+def create_health_score_chart():
+    """Create health score distribution histogram."""
+    if not data_loaded or customer_data.empty:
+        return None
+    
+    health_data = customer_data.get('current_health_score', customer_data.get('health_score', pd.Series([0])))
+    if health_data.empty:
+        return None
     
     fig = px.histogram(
-        data,
-        x='health_score',
+        customer_data,
+        x=health_data.name,
         nbins=20,
-        title="Customer Health Score Distribution",
-        labels={'health_score': 'Health Score', 'count': 'Number of Customers'},
+        title="Health Score Distribution",
         color_discrete_sequence=['#667eea']
     )
-    
-    fig.update_layout(height=400, showlegend=False)
+    fig.update_layout(
+        title_font_size=16,
+        font=dict(size=12)
+    )
     return fig
 
 def create_segment_chart():
-    """Create segment analysis chart."""
-    data = load_aura_data()
-    segment_metrics = data.groupby('segment').size()
+    """Create customer segment bar chart."""
+    if not data_loaded or customer_data.empty:
+        return None
     
+    segment_data = customer_data.get('segment', '')
+    if segment_data.empty:
+        return None
+    
+    segment_counts = segment_data.value_counts()
     fig = px.bar(
-        segment_metrics.reset_index(),
-        x='segment',
-        y=0,
-        title="Customers by Segment",
-        labels={0: 'Number of Customers', 'segment': 'Customer Segment'},
-        color='segment',
-        color_discrete_sequence=['#667eea', '#764ba2', '#f093fb']
+        x=segment_counts.index,
+        y=segment_counts.values,
+        title="Customer Segments",
+        color_discrete_sequence=['#764ba2']
     )
-    
-    fig.update_layout(height=400, showlegend=False)
+    fig.update_layout(
+        title_font_size=16,
+        font=dict(size=12)
+    )
     return fig
 
-def get_customer_table(segment_filter="All", risk_filter="All"):
-    """Get filtered customer table."""
-    data = load_aura_data()
+def get_customer_table():
+    """Get customer data table."""
+    if not data_loaded or customer_data.empty:
+        return pd.DataFrame()
     
-    if segment_filter != "All":
-        data = data[data['segment'] == segment_filter]
-    
-    if risk_filter != "All":
-        data = data[data['churn_risk'] == risk_filter]
-    
-    return data.head(50)
+    display_cols = ['customer_id', 'name', 'segment', 'subscription_plan', 'current_health_score', 'churn_risk_level']
+    available_cols = [col for col in display_cols if col in customer_data.columns]
+    return customer_data[available_cols].head(20)
 
 def analyze_customer(customer_id):
     """Analyze a specific customer."""
-    data = load_aura_data()
-    customer = data[data['customer_id'] == customer_id]
+    if not data_loaded or customer_data.empty:
+        return "No data loaded. Please load data first."
     
+    if not customer_id:
+        return "Please enter a customer ID."
+    
+    # Find customer
+    customer = customer_data[customer_data['customer_id'] == customer_id]
     if customer.empty:
         return f"Customer {customer_id} not found."
     
-    customer = customer.iloc[0]
+    customer_info = customer.iloc[0]
     
-    return f"""
-    🔍 **Customer Analysis: {customer['name']}**
+    # Create analysis
+    analysis = f"""
+    ## Customer Analysis: {customer_info['name']}
     
-    **Customer ID:** {customer['customer_id']}
-    **Segment:** {customer['segment']}
-    **Subscription Plan:** {customer['subscription_plan']}
-    **Health Score:** {customer['health_score']:.1f}/100
-    **Churn Risk:** {customer['churn_risk']}
-    **Lifetime Revenue:** ${customer['lifetime_revenue']:,.0f}
-    **Engagement Score:** {customer['engagement_score']:.2f}
-    **Last Activity:** {customer['last_activity_days']} days ago
+    **Customer ID:** {customer_info['customer_id']}
+    **Segment:** {customer_info.get('segment', 'N/A')}
+    **Subscription Plan:** {customer_info.get('subscription_plan', 'N/A')}
+    **Health Score:** {customer_info.get('current_health_score', 'N/A')}
+    **Churn Risk:** {customer_info.get('churn_risk_level', 'N/A')}
+    **Lifetime Revenue:** ${customer_info.get('total_lifetime_revenue', 0):,.2f}
+    **Engagement Score:** {customer_info.get('engagement_score', 0):.2f}
+    **Days Since Last Engagement:** {customer_info.get('days_since_last_engagement', 'N/A')}
+    **Support Tickets:** {customer_info.get('total_support_tickets_lifetime', 'N/A')}
     
-    **Recommendations:**
+    ### Recommendations:
     """
-    + ("🚨 **High Priority:** Schedule immediate retention call" if customer['churn_risk'] == 'High' else
-       "⚠️ **Medium Priority:** Send personalized engagement content" if customer['churn_risk'] == 'Medium' else
-       "✅ **Low Risk:** Continue current relationship management")
+    
+    # Add recommendations based on data
+    if customer_info.get('churn_risk_level') == 'High':
+        analysis += "\n- ⚠️ **High churn risk detected** - Immediate intervention needed"
+        analysis += "\n- 📞 Schedule retention call with customer success team"
+        analysis += "\n- 🎯 Offer personalized incentives or discounts"
+    
+    if customer_info.get('current_health_score', 0) < 50:
+        analysis += "\n- 📈 **Low health score** - Focus on engagement improvement"
+        analysis += "\n- 📚 Provide additional training and resources"
+        analysis += "\n- 🤝 Assign dedicated customer success manager"
+    
+    if customer_info.get('days_since_last_engagement', 0) > 30:
+        analysis += "\n- ⏰ **Low recent engagement** - Re-engagement campaign needed"
+        analysis += "\n- 📧 Send personalized re-engagement emails"
+        analysis += "\n- 🎪 Invite to upcoming webinars or events"
+    
+    return analysis
 
 def get_retention_strategies():
-    """Get comprehensive retention strategies."""
-    strategies = [
-        {
-            "name": "Personalized Onboarding",
-            "description": "Create tailored onboarding experiences based on customer segment and goals",
-            "implementation": "Develop segment-specific onboarding flows with milestone tracking",
-            "roi": "25% reduction in early churn",
-            "effort": "Medium"
-        },
-        {
-            "name": "Proactive Health Monitoring",
-            "description": "Implement real-time health score monitoring with automated alerts",
-            "implementation": "Set up health score dashboards and automated intervention triggers",
-            "roi": "30% improvement in retention rates",
-            "effort": "High"
-        },
-        {
-            "name": "Engagement Campaigns",
-            "description": "Launch targeted engagement campaigns for at-risk customers",
-            "implementation": "Create automated email sequences and in-app messaging",
-            "roi": "20% increase in customer engagement",
-            "effort": "Low"
-        },
-        {
-            "name": "Success Manager Program",
-            "description": "Assign dedicated success managers to high-value customers",
-            "implementation": "Hire and train success managers for enterprise customers",
-            "roi": "40% improvement in enterprise retention",
-            "effort": "High"
-        },
-        {
-            "name": "Feature Adoption Programs",
-            "description": "Drive feature adoption through targeted training and incentives",
-            "implementation": "Create feature adoption tracking and reward programs",
-            "roi": "35% increase in feature adoption",
-            "effort": "Medium"
-        }
-    ]
+    """Get retention strategies based on current data."""
+    if not data_loaded or customer_data.empty:
+        return "No data loaded. Please load data first."
+    
+    strategies = """
+    ## 🎯 A.U.R.A Retention Strategies
+    
+    ### High-Risk Customer Intervention
+    - **Immediate Action Required:** {high_risk_count} customers at high churn risk
+    - **Strategy:** Proactive outreach with personalized retention offers
+    - **Timeline:** Within 48 hours
+    
+    ### Health Score Improvement
+    - **Focus Area:** {low_health_count} customers with health scores below 50
+    - **Strategy:** Enhanced onboarding and success management
+    - **Timeline:** 2-4 weeks improvement cycle
+    
+    ### Engagement Recovery
+    - **Target:** {low_engagement_count} customers with low recent engagement
+    - **Strategy:** Multi-channel re-engagement campaigns
+    - **Timeline:** 1-2 weeks campaign duration
+    
+    ### Revenue Optimization
+    - **Opportunity:** {upsell_candidates} customers ready for plan upgrades
+    - **Strategy:** Value-based upselling with ROI demonstrations
+    - **Timeline:** Next billing cycle
+    """.format(
+        high_risk_count=len(customer_data[customer_data.get('churn_risk_level', '') == 'High']),
+        low_health_count=len(customer_data[customer_data.get('current_health_score', 100) < 50]),
+        low_engagement_count=len(customer_data[customer_data.get('days_since_last_engagement', 0) > 30]),
+        upsell_candidates=len(customer_data[customer_data.get('current_health_score', 0) > 80])
+    )
+    
     return strategies
 
 def chat_with_aura(message, history):
-    """Enhanced A.U.R.A chatbot function."""
+    """Chat with A.U.R.A AI assistant."""
     if not message:
-        return history
+        return history, ""
     
+    # Simple AI responses based on keywords
     message_lower = message.lower()
     
-    if "customer" in message_lower and "risk" in message_lower:
-        response = "Based on your customer data, I can see that 10% of customers are at high churn risk. I recommend focusing on personalized retention strategies for these customers."
-    elif "revenue" in message_lower:
-        response = "Your total lifetime revenue is $2.4M with an average of $4,800 per customer. The revenue trend shows 15% growth month-over-month."
-    elif "health" in message_lower:
-        response = "The average customer health score is 60.2. Customers with scores below 50 need immediate attention. I suggest implementing health score monitoring alerts."
-    elif "segment" in message_lower:
-        response = "Your customer base is distributed as follows: 50% SMB, 30% Medium-Value, and 20% High-Value customers. High-Value customers generate 70% of your revenue."
-    elif "strategy" in message_lower or "retention" in message_lower:
-        response = "I recommend implementing these key retention strategies: 1) Personalized Onboarding, 2) Proactive Health Monitoring, 3) Engagement Campaigns. Would you like me to elaborate on any specific strategy?"
-    elif "help" in message_lower:
-        response = "I can help you with: customer risk analysis, revenue insights, health score monitoring, segment analysis, retention strategies, and data exploration. What would you like to know?"
+    if "churn" in message_lower or "retention" in message_lower:
+        response = "I can help you analyze churn risk and retention strategies. Based on your current data, I recommend focusing on high-risk customers first."
+    elif "health" in message_lower or "score" in message_lower:
+        response = "Health scores indicate customer satisfaction and engagement levels. Customers with scores below 50 need immediate attention."
+    elif "revenue" in message_lower or "upsell" in message_lower:
+        response = "Revenue optimization opportunities exist among high-health-score customers. Consider targeted upselling campaigns."
+    elif "engagement" in message_lower:
+        response = "Engagement metrics show customer activity levels. Low engagement often precedes churn - implement re-engagement campaigns."
+    elif "help" in message_lower or "what" in message_lower:
+        response = "I'm A.U.R.A, your Adaptive User Retention Assistant. I can help with churn analysis, retention strategies, customer health monitoring, and revenue optimization. What would you like to know?"
     else:
-        response = "I'm here to help you analyze your customer retention data. You can ask me about customer risk levels, revenue trends, health scores, retention strategies, or request recommendations for improving retention."
+        response = "I understand you're asking about customer retention. Could you be more specific about what aspect you'd like help with?"
     
     history.append([message, response])
-    return history
+    return history, ""
 
-# Create the comprehensive Gradio interface
+# Create the Gradio interface
 with gr.Blocks(
     title="A.U.R.A - Adaptive User Retention Assistant",
     theme=gr.themes.Soft(
-        primary_hue="blue",
-        secondary_hue="purple",
-        neutral_hue="slate"
-    )
+        primary_hue=gr.themes.Color(c50="#e0eff7", c100="#c2e0f0", c200="#a3d0e9", c300="#85c1e2", c400="#66b1db", c500="#47a2d4", c600="#3a82a9", c700="#2d627e", c800="#204253", c900="#132228", c950="#0a1114"),
+        secondary_hue=gr.themes.Color(c50="#e0f7f7", c100="#c2f0f0", c200="#a3e9e9", c300="#85e2e2", c400="#66dbdb", c500="#47d4d4", c600="#3aabab", c700="#2d8282", c800="#205353", c900="#132828", c950="#0a1414"),
+        neutral_hue=gr.themes.Color(c50="#f8f8f8", c100="#f0f0f0", c200="#e9e9e9", c300="#e2e2e2", c400="#dbdbdb", c500="#d4d4d4", c600="#ababab", c700="#828282", c800="#535353", c900="#282828", c950="#141414"),
+    ),
+    css="""
+    .gradio-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Inter', sans-serif;
+    }
+    .gr-panel {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #004D7A;
+        font-weight: 700;
+    }
+    .gr-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    .gr-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    .gr-tab-button.selected {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    """
 ) as app:
     
     # Header
-    gr.HTML("""
-    <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-        <h1>🤖 A.U.R.A</h1>
-        <h2>Adaptive User Retention Assistant</h2>
-        <p>Intelligent customer retention and engagement analytics</p>
-    </div>
-    """)
+    gr.Markdown(
+        """
+        # 🤖 A.U.R.A - Adaptive User Retention Assistant
+        
+        **Adaptive User Retention Assistant Platform** - Advanced customer analytics and retention strategies powered by AI.
+        """,
+        elem_classes=["header"]
+    )
     
     # Main tabs
     with gr.Tabs():
         
         # Dashboard Tab
         with gr.Tab("📊 Dashboard"):
+            gr.Markdown("## Executive Dashboard")
             
+            # Data loading section
             with gr.Row():
-                with gr.Column(scale=1):
-                    gr.Markdown("### 🚀 Quick Actions")
-                    load_btn = gr.Button("📊 Load A.U.R.A Data", variant="primary", size="lg")
-                
-                with gr.Column(scale=2):
-                    gr.Markdown("### 📈 Key Metrics")
-                    metrics_output = gr.Markdown()
+                load_btn = gr.Button("🔄 Load A.U.R.A Data", variant="primary")
+                status_text = gr.Textbox(label="Status", interactive=False)
             
-            # Charts
-            gr.Markdown("### 📊 Analytics Dashboard")
+            load_btn.click(
+                load_aura_data,
+                outputs=[status_text]
+            )
             
+            # Metrics row
+            with gr.Row():
+                total_customers = gr.Textbox(label="Total Customers", interactive=False)
+                high_risk = gr.Textbox(label="High Risk Customers", interactive=False)
+                avg_health = gr.Textbox(label="Average Health Score", interactive=False)
+                total_revenue = gr.Textbox(label="Total Revenue", interactive=False)
+            
+            # Charts row
             with gr.Row():
                 with gr.Column():
                     risk_chart = gr.Plot(label="Risk Distribution")
                 with gr.Column():
                     health_chart = gr.Plot(label="Health Score Distribution")
             
-            with gr.Row():
-                segment_chart = gr.Plot(label="Segment Analysis")
+            # Segment chart
+            segment_chart = gr.Plot(label="Customer Segments")
             
-            # Event handlers
+            # Customer table
+            customer_table = gr.Dataframe(
+                label="Customer Overview",
+                interactive=False,
+                wrap=True
+            )
+            
+            # Update dashboard when data is loaded
             load_btn.click(
-                fn=get_metrics,
-                outputs=metrics_output
+                get_metrics,
+                outputs=[total_customers, high_risk, avg_health, total_revenue]
             )
             
             load_btn.click(
-                fn=create_risk_chart,
-                outputs=risk_chart
+                create_risk_distribution_chart,
+                outputs=[risk_chart]
             )
             
             load_btn.click(
-                fn=create_health_chart,
-                outputs=health_chart
+                create_health_score_chart,
+                outputs=[health_chart]
             )
             
             load_btn.click(
-                fn=create_segment_chart,
-                outputs=segment_chart
+                create_segment_chart,
+                outputs=[segment_chart]
+            )
+            
+            load_btn.click(
+                get_customer_table,
+                outputs=[customer_table]
             )
         
         # Customer Analysis Tab
         with gr.Tab("👥 Customer Analysis"):
+            gr.Markdown("## Individual Customer Analysis")
             
-            gr.Markdown("### 🔍 Customer Data Explorer")
-            
-            with gr.Row():
-                with gr.Column():
-                    segment_filter = gr.Dropdown(
-                        choices=["All", "SMB", "Medium-Value", "High-Value"],
-                        value="All",
-                        label="Filter by Segment"
-                    )
-                    risk_filter = gr.Dropdown(
-                        choices=["All", "Low", "Medium", "High"],
-                        value="All",
-                        label="Filter by Risk Level"
-                    )
-                
-                with gr.Column():
-                    customer_table = gr.Dataframe(
-                        label="Customer Data",
-                        interactive=False,
-                        wrap=True
-                    )
-            
-            # Customer insights
-            gr.Markdown("### 🎯 Individual Customer Analysis")
-            
-            with gr.Row():
-                with gr.Column():
-                    customer_id_input = gr.Textbox(
-                        label="Enter Customer ID",
-                        placeholder="e.g., CUST_0001"
-                    )
-                    analyze_btn = gr.Button("🔍 Analyze Customer", variant="secondary")
-                
-                with gr.Column():
-                    insights_output = gr.Markdown()
-            
-            # Event handlers
-            segment_filter.change(
-                fn=get_customer_table,
-                inputs=[segment_filter, risk_filter],
-                outputs=customer_table
+            customer_id_input = gr.Textbox(
+                label="Customer ID",
+                placeholder="Enter customer ID (e.g., CUST_0001)",
+                info="Enter a customer ID to analyze their profile and get recommendations"
             )
             
-            risk_filter.change(
-                fn=get_customer_table,
-                inputs=[segment_filter, risk_filter],
-                outputs=customer_table
-            )
+            analyze_btn = gr.Button("🔍 Analyze Customer", variant="primary")
+            
+            customer_analysis = gr.Markdown(label="Customer Analysis")
             
             analyze_btn.click(
-                fn=analyze_customer,
-                inputs=customer_id_input,
-                outputs=insights_output
+                analyze_customer,
+                inputs=[customer_id_input],
+                outputs=[customer_analysis]
             )
         
         # Retention Strategies Tab
         with gr.Tab("💡 Retention Strategies"):
+            gr.Markdown("## AI-Powered Retention Strategies")
             
-            gr.Markdown("### 🎯 Comprehensive Retention Strategy Playbook")
-            gr.Markdown("Explore proven retention strategies with implementation guidance and ROI analysis.")
+            strategies_btn = gr.Button("🎯 Generate Strategies", variant="primary")
             
-            with gr.Row():
-                with gr.Column():
-                    strategy_dropdown = gr.Dropdown(
-                        choices=["All Strategies", "Personalized Onboarding", "Proactive Health Monitoring", 
-                               "Engagement Campaigns", "Success Manager Program", "Feature Adoption Programs"],
-                        value="All Strategies",
-                        label="Select Strategy"
-                    )
-                    strategy_output = gr.Markdown()
-                
-                with gr.Column():
-                    gr.Markdown("### 📊 Strategy Overview")
-                    strategy_table = gr.Dataframe(
-                        label="Retention Strategies",
-                        interactive=False,
-                        wrap=True
-                    )
+            retention_strategies = gr.Markdown(label="Retention Strategies")
             
-            def display_strategy(strategy_name):
-                strategies = get_retention_strategies()
-                if strategy_name == "All Strategies":
-                    return strategies, "### 🎯 All Retention Strategies\n\nSelect a specific strategy to see detailed implementation guidance."
-                else:
-                    strategy = next((s for s in strategies if s["name"] == strategy_name), None)
-                    if strategy:
-                        return strategies, f"""
-                        ### 🎯 {strategy['name']}
-                        
-                        **Description:** {strategy['description']}
-                        
-                        **Implementation:** {strategy['implementation']}
-                        
-                        **Expected ROI:** {strategy['roi']}
-                        
-                        **Implementation Effort:** {strategy['effort']}
-                        """
-                    return strategies, "Strategy not found."
-            
-            strategy_dropdown.change(
-                fn=display_strategy,
-                inputs=strategy_dropdown,
-                outputs=[strategy_table, strategy_output]
+            strategies_btn.click(
+                get_retention_strategies,
+                outputs=[retention_strategies]
             )
         
-        # AI Chatbot Tab
+        # AI Assistant Tab
         with gr.Tab("🤖 AI Assistant"):
-            
-            gr.Markdown("### 💬 Chat with A.U.R.A AI Assistant")
-            gr.Markdown("Ask questions about your customer data, get insights, and receive recommendations.")
+            gr.Markdown("## Chat with A.U.R.A AI Assistant")
             
             chatbot = gr.Chatbot(
                 label="A.U.R.A Assistant",
-                height=400,
-                show_copy_button=True,
-                type="messages"
+                type="messages",
+                height=400
             )
             
             with gr.Row():
                 msg_input = gr.Textbox(
-                    label="Your Message",
-                    placeholder="Ask me anything about your customers...",
+                    label="Ask A.U.R.A anything about customer retention",
+                    placeholder="Ask about churn analysis, retention strategies, or customer health...",
                     scale=4
                 )
                 send_btn = gr.Button("Send", variant="primary", scale=1)
             
-            send_btn.click(
-                fn=chat_with_aura,
+            # Chat functionality
+            msg_input.submit(
+                chat_with_aura,
                 inputs=[msg_input, chatbot],
                 outputs=[chatbot, msg_input]
             )
             
-            msg_input.submit(
-                fn=chat_with_aura,
+            send_btn.click(
+                chat_with_aura,
                 inputs=[msg_input, chatbot],
                 outputs=[chatbot, msg_input]
             )
     
     # Footer
-    gr.HTML("""
-    <div style="text-align: center; margin-top: 2rem; padding: 1rem; color: #666;">
-        <p>🤖 A.U.R.A - Adaptive User Retention Assistant | Built with Gradio | Version 1.0.0</p>
-    </div>
-    """)
+    gr.Markdown(
+        f"""
+        ---
+        <div style="text-align: center; color: #666; font-size: 0.9em;">
+        🤖 A.U.R.A - Adaptive User Retention Assistant | Built with Gradio | Version {settings.PROJECT_VERSION}
+        </div>
+        """,
+        elem_classes=["footer"]
+    )
 
-# Launch the application
 if __name__ == "__main__":
     app.launch(
         server_name="0.0.0.0",
