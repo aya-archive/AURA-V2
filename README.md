@@ -55,10 +55,10 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
 
 ### Technology Stack
 - **Backend**: Python 3.8+, Pandas, NumPy, Scikit-learn
-- **Frontend**: Gradio, Streamlit, Plotly, Matplotlib
+- **Frontend**: Gradio, Plotly, Matplotlib
 - **AI/ML**: Prophet, Transformers, Sentence-Transformers
 - **Data**: Parquet, CSV, JSON
-- **Deployment**: Gradio Spaces, Streamlit Cloud, Docker
+- **Deployment**: Hugging Face Spaces, Docker
 
 ## 🚀 Quick Start
 
@@ -71,8 +71,8 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/aura-v2.git
-   cd aura-v2
+   git clone https://github.com/aya-archive/AURA-V2.git
+   cd AURA-V2
    ```
 
 2. **Install dependencies**
@@ -92,88 +92,10 @@ Transform customer retention from reactive to proactive by leveraging AI and mac
 
 5. **Launch the application**
    ```bash
-   python3 aura_gradio_app.py
+   python aura_gradio_app.py
    ```
 
-### Docker Deployment
-
-1. **Build the Docker image**
-   ```bash
-   docker build -t aura-platform .
-   ```
-
-2. **Run the container**
-   ```bash
-   docker run -p 8501:8501 aura-platform
-   ```
-
-## 📊 Data Sources
-
-The platform processes data from multiple sources:
-
-- **Customer Demographics**: Basic customer information and subscription details
-- **Transaction History**: Payment records, revenue data, and billing information
-- **Engagement Logs**: User interactions, feature usage, and activity tracking
-- **Support Interactions**: Support tickets, chat logs, and customer service data
-- **Feedback Surveys**: NPS scores, satisfaction ratings, and customer feedback
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the project root:
-
-```env
-# Database Configuration
-DATABASE_URL=postgresql://user:password@host:port/dbname
-
-# Streamlit Configuration
-STREAMLIT_SERVER_PORT=8501
-STREAMLIT_SERVER_ADDRESS=0.0.0.0
-
-# AI Model Configuration
-PROPHET_MODEL_PATH=models/forecasting/trained_prophet_model.joblib
-DECISION_RULES_PATH=models/decision_engine/rules.json
-CHATBOT_KB_PATH=models/chatbot/knowledge_base.json
-
-# Data Generation
-MOCK_DATA_CUSTOMERS=500
-MOCK_DATA_TRANSACTIONS_PER_CUSTOMER=10
-MOCK_DATA_ENGAGEMENT_EVENTS_PER_CUSTOMER=50
-```
-
-### Streamlit Configuration
-The platform includes custom Streamlit theming in `.streamlit/config.toml`:
-
-- **A.U.R.A Brand Colors**: Deep blue (#004D7A) and teal (#00B3B3) color scheme
-- **Custom Typography**: Lato font family for modern, clean appearance
-- **Responsive Design**: Mobile-friendly layout and components
-- **Accessibility**: WCAG AA compliance and keyboard navigation
-
-## 🧪 Testing
-
-### Run Unit Tests
-```bash
-# Data Pipeline Tests
-python -m pytest src/tests/unit/test_data_pipeline.py -v
-
-# Model Tests
-python -m pytest src/tests/unit/test_models.py -v
-
-# All Tests
-python -m pytest src/tests/ -v
-```
-
-### Run Integration Tests
-```bash
-python -m pytest src/tests/integration/ -v
-```
-
-### Test Coverage
-```bash
-python -m pytest --cov=src --cov-report=html
-```
-
-## 📈 Usage Examples
+## 📊 Usage Examples
 
 ### A.U.R.A Interface
 The modern Gradio interface provides 6 main tabs:
@@ -208,7 +130,6 @@ The modern Gradio interface provides 6 main tabs:
 - **Strategy Advice**: Get recommendations like "What strategies should I use?"
 - **Interactive Chat**: Conversational AI for data exploration and insights
 
-
 ## 🔒 Security & Privacy
 
 - **Local Processing**: All data processing happens locally on your infrastructure
@@ -219,20 +140,23 @@ The modern Gradio interface provides 6 main tabs:
 
 ## 🚀 Deployment
 
-### Streamlit Cloud
-1. **Connect Repository**: Link your GitHub repository to Streamlit Cloud
-2. **Configure Secrets**: Set up environment variables in Streamlit Cloud
-3. **Deploy**: Automatic deployment with custom domain support
+### Hugging Face Spaces
+1. **Fork this repository** to your GitHub account
+2. **Go to [Hugging Face Spaces](https://huggingface.co/spaces)**
+3. **Create New Space** → Select "Gradio"
+4. **Connect your forked repository**
+5. **Deploy automatically!**
 
 ### Docker Deployment
-1. **Build Image**: Use the provided Dockerfile for containerized deployment
-2. **Environment Variables**: Configure through Docker environment or secrets
-3. **Scale**: Deploy multiple instances with load balancing
+1. **Build the Docker image**
+   ```bash
+   docker build -t aura-platform .
+   ```
 
-### Local Development
-1. **Development Mode**: Run with `streamlit run src/dashboard/app.py --server.runOnSave true`
-2. **Hot Reload**: Automatic reloading on code changes
-3. **Debug Mode**: Enable detailed logging and error reporting
+2. **Run the container**
+   ```bash
+   docker run -p 7860:7860 aura-platform
+   ```
 
 ## 📚 API Documentation
 
@@ -322,7 +246,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Streamlit Team**: For the amazing web framework
+- **Gradio Team**: For the amazing web framework
 - **Prophet Team**: For the powerful forecasting library
 - **Open Source Community**: For the incredible tools and libraries
 - **Contributors**: For their valuable contributions and feedback

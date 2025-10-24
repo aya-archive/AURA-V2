@@ -1,110 +1,43 @@
-# A.U.R.A (Adaptive User Retention Assistant) - Python Dependencies
-# This file contains all Python packages required for the A.U.R.A platform
-# Organized by functionality for better maintainability
+# A.U.R.A (Adaptive User Retention Assistant) - Hugging Face Spaces Requirements
+# Optimized requirements for Hugging Face Spaces deployment
 
-# Core Data Processing Libraries
-# Essential libraries for data manipulation and analysis in the Medallion architecture
-pandas>=2.0.0              # Primary data manipulation library for Bronze/Silver/Gold layers
-numpy>=1.24.0              # Numerical computing foundation for all data operations
-pyarrow>=12.0.0            # High-performance columnar data format for Gold layer storage
+# Core Gradio and Web Framework
+gradio>=4.0.0
 
-# Data Quality and Exploration
-# Libraries for data validation, cleaning, and exploratory data analysis
-sweetviz>=2.3.0            # Automated EDA and data quality analysis for Bronze layer validation
-great-expectations>=0.17.0 # Data validation and quality monitoring framework
+# Data Processing and Analysis
+pandas>=2.0.0
+numpy>=1.24.0
+pyarrow>=12.0.0
 
-# Machine Learning and AI Models
-# Core ML libraries for forecasting, classification, and decision engines
-scikit-learn>=1.3.0        # Primary ML library for classification, regression, and preprocessing
-xgboost>=1.7.0             # Gradient boosting for advanced churn prediction models
-prophet>=1.1.4             # Facebook's Prophet for time series forecasting (MVP focus)
-joblib>=1.3.0              # Model persistence and serialization for trained models
+# Visualization and Plotting
+plotly>=5.15.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
 
-# Natural Language Processing (for AI Chatbot)
-# Libraries for text processing, sentiment analysis, and conversational AI
-transformers>=4.30.0       # Hugging Face transformers for NLP in chatbot
-torch>=2.0.0               # PyTorch backend for transformer models
-sentence-transformers>=2.2.0 # Semantic text embeddings for chatbot context
-spacy>=3.6.0               # Advanced NLP for text preprocessing and entity recognition
-nltk>=3.8.0                # Natural language toolkit for text processing
+# Machine Learning (Core)
+scikit-learn>=1.3.0
+joblib>=1.3.0
 
-# Dashboard and Web Interface
-# Gradio and visualization libraries for the main dashboard
-gradio>=4.0.0              # Primary web framework for A.U.R.A dashboard
-plotly>=5.15.0             # Interactive visualizations for dashboard charts
-matplotlib>=3.7.0           # Static plotting for data analysis and model evaluation
-seaborn>=0.12.0            # Statistical data visualization for EDA
+# Time Series Forecasting
+prophet>=1.1.4
 
-# Data Pipeline and ETL
-# Libraries for data transformation and orchestration
-apache-airflow>=2.6.0     # Workflow orchestration for data pipeline automation
-celery>=5.3.0              # Distributed task queue for background processing
-redis>=4.6.0               # Caching and session management for real-time features
+# Natural Language Processing (Lightweight)
+sentence-transformers>=2.2.0
+transformers>=4.30.0
 
-# Database and Storage
-# Database connectors and data storage libraries
-psycopg2-binary>=2.9.0    # PostgreSQL adapter for metadata storage
-sqlalchemy>=2.0.0          # SQL toolkit and ORM for database operations
-alembic>=1.11.0            # Database migration tool for schema management
+# Data Validation
+pandera>=0.17.0
 
-# API and Web Services
-# Libraries for REST API development and external service integration
-fastapi>=0.100.0           # High-performance API framework for microservices
-uvicorn>=0.23.0            # ASGI server for FastAPI applications
-requests>=2.31.0           # HTTP library for external API integrations
-httpx>=0.24.0              # Modern async HTTP client for high-performance requests
+# Configuration and Environment
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+pyyaml>=6.0
 
-# Configuration and Environment Management
-# Libraries for application configuration and environment handling
-python-dotenv>=1.0.0       # Environment variable management
-pydantic>=2.0.0            # Data validation and settings management
-pyyaml>=6.0                # YAML configuration file parsing
+# HTTP and API
+requests>=2.31.0
+httpx>=0.24.0
 
-# Monitoring and Logging
-# Libraries for application monitoring, logging, and observability
-prometheus-client>=0.17.0  # Prometheus metrics collection for monitoring
-structlog>=23.1.0          # Structured logging for better observability
-sentry-sdk>=1.30.0         # Error tracking and performance monitoring
-
-# Testing and Quality Assurance
-# Testing frameworks and code quality tools
-pytest>=7.4.0             # Primary testing framework
-pytest-cov>=4.1.0          # Coverage reporting for tests
-pytest-mock>=3.11.0        # Mocking utilities for unit tests
-black>=23.7.0              # Code formatting for consistent style
-flake8>=6.0.0              # Linting for code quality
-mypy>=1.5.0                # Static type checking for better code quality
-
-# Development and Debugging Tools
-# Tools for development, debugging, and code analysis
-jupyter>=1.0.0             # Jupyter notebooks for data exploration and model development
-ipython>=8.14.0            # Enhanced interactive Python shell
-pdbpp>=0.10.3              # Enhanced debugger for development
-
-# Security and Authentication
-# Libraries for security, authentication, and data protection
-cryptography>=41.0.0       # Cryptographic operations for data security
-bcrypt>=4.0.0              # Password hashing for user authentication
-python-jose>=3.3.0         # JWT token handling for API authentication
-
-# Performance and Optimization
-# Libraries for performance optimization and caching
-numba>=0.57.0              # JIT compilation for numerical computations
-cython>=3.0.0              # C extensions for performance-critical code
-memory-profiler>=0.61.0    # Memory usage profiling and optimization
-
-# Data Validation and Schema Management
-# Libraries for data validation and schema enforcement
-pandera>=0.17.0            # Data validation framework for pandas DataFrames
-jsonschema>=4.19.0         # JSON schema validation for API data
-
-# Optional: Cloud and Deployment
-# Libraries for cloud deployment and containerization (optional for MVP)
-boto3>=1.28.0              # AWS SDK for cloud services integration
-docker>=6.1.0              # Docker API for container management
-kubernetes>=27.2.0          # Kubernetes client for orchestration
-
-# Development Dependencies (not required for production)
-# These packages are only needed during development
-pre-commit>=3.3.0          # Git hooks for code quality
-isort>=5.12.0              # Import sorting for clean code organization
+# Utilities
+python-dateutil>=2.8.0
+pytz>=2023.3
