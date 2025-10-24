@@ -757,7 +757,7 @@ def chat_with_aura(message, history):
 • Ask about specific customers: "Analyze customer CUST_0001"
 • Get churn analysis: "What's our churn risk?"
 • Health insights: "Show health score analysis"
-• Revenue optimization: "How can we increase revenue?""""
+• Revenue optimization: "How can we increase revenue?"""
         
         # Help and general information
         elif "help" in message_lower or "what" in message_lower:
@@ -782,7 +782,7 @@ I'm your intelligent customer retention assistant, powered by advanced AI models
 🔧 **AI Model Status:** {'✅ Active' if aura_ai_model.is_loaded else '❌ Not available'}"""
         
         # Default AI response
-    else:
+        else:
             response = f"""🤖 **A.U.R.A AI Assistant**
 
 I understand you're asking about customer retention. I'm powered by advanced AI models including XGBoost for churn prediction.
