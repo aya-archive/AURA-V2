@@ -14,7 +14,6 @@ font = "Lato"                     # Modern, clean font
 port = 8501
 address = "0.0.0.0"
 headless = true
-enableCORS = false
 enableXsrfProtection = true
 
 [browser]
@@ -36,9 +35,3 @@ toolbarMode = "minimal"
 [runner]
 # Performance settings
 magicEnabled = true
-installTracer = false
-fixMatplotlib = true
-
-[deprecation]
-# Disable deprecation warnings for cleaner output
-showPyplotGlobalUse = false

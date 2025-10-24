@@ -5,7 +5,10 @@
 import os
 from pathlib import Path
 from typing import Dict, Any
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings
 from pydantic import Field
 
 class Settings(BaseSettings):
