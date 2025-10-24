@@ -1,14 +1,16 @@
-# A.U.R.A (Adaptive User Retention Assistant) Streamlit Configuration
-# This file contains custom configuration for the A.U.R.A platform
-# to provide a modern, professional user experience
+# A.U.R.A Streamlit Configuration
+# Custom theming and configuration for the AURA platform
 
-[global]
-# Development settings
-developmentMode = false
-showErrorDetails = true
+[theme]
+# A.U.R.A Brand Colors - Deep blue and teal theme
+primaryColor = "#00B3B3"          # Teal accent color
+backgroundColor = "#FFFFFF"        # Clean white background
+secondaryBackgroundColor = "#F0F2F6"  # Light gray for cards
+textColor = "#262730"            # Dark text for readability
+font = "Lato"                     # Modern, clean font
 
 [server]
-# Server configuration
+# Server configuration for Streamlit Cloud
 port = 8501
 address = "0.0.0.0"
 headless = true
@@ -21,13 +23,10 @@ gatherUsageStats = false
 serverAddress = "localhost"
 serverPort = 8501
 
-[theme]
-# A.U.R.A Custom Theme
-primaryColor = "#667eea"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f0f2f6"
-textColor = "#262730"
-font = "Inter, sans-serif"
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 [client]
 # Client-side settings
@@ -35,16 +34,11 @@ showErrorDetails = true
 toolbarMode = "minimal"
 
 [runner]
-# Runner settings
+# Performance settings
 magicEnabled = true
 installTracer = false
 fixMatplotlib = true
 
-[logger]
-# Logging configuration
-level = "info"
-messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-
 [deprecation]
-# Deprecation warnings
+# Disable deprecation warnings for cleaner output
 showPyplotGlobalUse = false
