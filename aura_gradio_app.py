@@ -21,6 +21,7 @@ from src.dashboard.utils.plot_utils import DashboardPlotUtils
 from src.data_pipeline.orchestrator import DataPipelineOrchestrator
 from src.models.forecasting.prophet_model import ProphetForecastingModel
 from src.models.decision_engine.rules_engine import RuleBasedDecisionEngine
+from src.models.chatbot.aura_ai_model import aura_ai_model
 from src.config.settings import settings
 
 # Configure logging
@@ -595,25 +596,214 @@ def get_retention_strategies():
     return strategies
 
 def chat_with_aura(message, history):
-    """Chat with A.U.R.A AI assistant."""
+    """Chat with A.U.R.A AI assistant powered by machine learning."""
     if not message:
         return history, ""
     
-    # Simple AI responses based on keywords
     message_lower = message.lower()
     
-    if "churn" in message_lower or "retention" in message_lower:
-        response = "I can help you analyze churn risk and retention strategies. Based on your current data, I recommend focusing on high-risk customers first."
+    # AI-powered responses using the trained model
+    try:
+        # Check if user is asking about a specific customer
+        if "customer" in message_lower and any(id_pattern in message_lower for id_pattern in ["cust_", "customer_", "id"]):
+            # Extract customer ID if mentioned
+            customer_id = None
+            for word in message.split():
+                if word.upper().startswith("CUST_") or word.upper().startswith("CUSTOMER_"):
+                    customer_id = word.upper()
+                    break
+            
+            if customer_id and data_loaded and not customer_data.empty:
+                # Find customer data
+                customer = customer_data[customer_data['customer_id'] == customer_id]
+                if not customer.empty:
+                    customer_info = customer.iloc[0].to_dict()
+                    
+                    # Get AI insights for this customer
+                    ai_insights = aura_ai_model.get_ai_insights(customer_info)
+                    response = f"🤖 **AI Analysis for {customer_id}:**\n\n{ai_insights}"
+                else:
+                    response = f"❌ Customer {customer_id} not found in the current dataset. Please check the customer ID and try again."
+            else:
+                response = "❌ Please provide a valid customer ID (e.g., CUST_0001) to get AI-powered analysis."
+        
+        # AI-powered churn analysis
+        elif "churn" in message_lower or "retention" in message_lower:
+            if data_loaded and not customer_data.empty:
+                # Analyze overall churn risk
+                high_risk_count = len(customer_data[customer_data.get('churn_risk_level', '') == 'High'])
+                total_customers = len(customer_data)
+                churn_rate = (high_risk_count / total_customers) * 100
+                
+                response = f"""🤖 **AI Churn Analysis:**
+
+📊 **Current Churn Risk Overview:**
+• High-risk customers: {high_risk_count:,} ({churn_rate:.1f}%)
+• Total customers analyzed: {total_customers:,}
+• AI model status: {'✅ Active' if aura_ai_model.is_loaded else '❌ Not available'}
+
+🎯 **AI Recommendations:**
+• Focus on the {high_risk_count:,} high-risk customers first
+• Implement immediate retention campaigns
+• Use AI predictions for personalized interventions
+• Monitor engagement trends and health scores
+
+💡 **Next Steps:**
+• Ask about specific customers: "Analyze customer CUST_0001"
+• Get detailed risk analysis for individual customers
+• Use AI insights for targeted retention strategies"""
+            else:
+                response = "❌ No customer data loaded. Please load data first to get AI-powered churn analysis."
+        
+        # AI-powered health score analysis
     elif "health" in message_lower or "score" in message_lower:
-        response = "Health scores indicate customer satisfaction and engagement levels. Customers with scores below 50 need immediate attention."
+            if data_loaded and not customer_data.empty:
+                avg_health = customer_data.get('current_health_score', pd.Series([0])).mean()
+                low_health_count = len(customer_data[customer_data.get('current_health_score', 100) < 50])
+                
+                response = f"""🤖 **AI Health Score Analysis:**
+
+📊 **Health Score Overview:**
+• Average health score: {avg_health:.1f}/100
+• Low health customers (<50): {low_health_count:,}
+• AI model confidence: {'High' if aura_ai_model.is_loaded else 'Not available'}
+
+🎯 **AI Insights:**
+• Health scores below 50 indicate high churn risk
+• Focus on {low_health_count:,} customers needing immediate attention
+• Implement health score improvement programs
+• Use AI predictions for proactive interventions
+
+💡 **AI Recommendations:**
+• Personalized health improvement plans
+• Enhanced onboarding for low-health customers
+• Regular health score monitoring and alerts"""
+            else:
+                response = "❌ No customer data loaded. Please load data first to get AI-powered health analysis."
+        
+        # AI-powered revenue optimization
     elif "revenue" in message_lower or "upsell" in message_lower:
-        response = "Revenue optimization opportunities exist among high-health-score customers. Consider targeted upselling campaigns."
+            if data_loaded and not customer_data.empty:
+                total_revenue = customer_data.get('total_lifetime_revenue', pd.Series([0])).sum()
+                high_value_count = len(customer_data[customer_data.get('current_health_score', 0) > 80])
+                
+                response = f"""🤖 **AI Revenue Optimization Analysis:**
+
+💰 **Revenue Overview:**
+• Total lifetime revenue: ${total_revenue:,.0f}
+• High-value customers (>80 health): {high_value_count:,}
+• AI model status: {'✅ Active' if aura_ai_model.is_loaded else '❌ Not available'}
+
+🎯 **AI Revenue Insights:**
+• Focus on {high_value_count:,} high-health customers for upselling
+• Use AI predictions to identify upsell opportunities
+• Implement value-based retention strategies
+• Optimize pricing for different customer segments
+
+💡 **AI Recommendations:**
+• Targeted upselling campaigns for high-health customers
+• Personalized pricing strategies
+• Revenue growth through AI-driven insights
+• Customer lifetime value optimization"""
+            else:
+                response = "❌ No customer data loaded. Please load data first to get AI-powered revenue analysis."
+        
+        # AI-powered engagement analysis
     elif "engagement" in message_lower:
-        response = "Engagement metrics show customer activity levels. Low engagement often precedes churn - implement re-engagement campaigns."
+            if data_loaded and not customer_data.empty:
+                avg_engagement = customer_data.get('engagement_score', pd.Series([0])).mean()
+                low_engagement_count = len(customer_data[customer_data.get('days_since_last_engagement', 0) > 30])
+                
+                response = f"""🤖 **AI Engagement Analysis:**
+
+📊 **Engagement Overview:**
+• Average engagement score: {avg_engagement:.2f}
+• Low engagement customers (>30 days): {low_engagement_count:,}
+• AI model confidence: {'High' if aura_ai_model.is_loaded else 'Not available'}
+
+🎯 **AI Engagement Insights:**
+• Low engagement often precedes churn
+• Focus on {low_engagement_count:,} customers needing re-engagement
+• Use AI predictions for engagement optimization
+• Implement personalized engagement strategies
+
+💡 **AI Recommendations:**
+• Re-engagement campaigns for inactive customers
+• Personalized content and feature recommendations
+• AI-driven engagement scoring and alerts
+• Multi-channel engagement optimization"""
+            else:
+                response = "❌ No customer data loaded. Please load data first to get AI-powered engagement analysis."
+        
+        # AI model status and capabilities
+        elif "model" in message_lower or "ai" in message_lower or "status" in message_lower:
+            model_status = aura_ai_model.get_model_status()
+            response = f"""🤖 **A.U.R.A AI Model Status:**
+
+🔧 **Model Information:**
+• Model loaded: {'✅ Yes' if model_status['is_loaded'] else '❌ No'}
+• Model type: {model_status['model_type']}
+• Features: {model_status['feature_count']} input features
+• Classes: {model_status['model_classes']}
+
+🎯 **AI Capabilities:**
+• Churn risk prediction with XGBoost
+• Customer health score analysis
+• Engagement pattern recognition
+• Revenue optimization insights
+• Personalized retention recommendations
+
+💡 **How to Use AI:**
+• Ask about specific customers: "Analyze customer CUST_0001"
+• Get churn analysis: "What's our churn risk?"
+• Health insights: "Show health score analysis"
+• Revenue optimization: "How can we increase revenue?""""
+        
+        # Help and general information
     elif "help" in message_lower or "what" in message_lower:
-        response = "I'm A.U.R.A, your Adaptive User Retention Assistant. I can help with churn analysis, retention strategies, customer health monitoring, and revenue optimization. What would you like to know?"
+            response = f"""🤖 **A.U.R.A AI Assistant - Powered by Machine Learning**
+
+I'm your intelligent customer retention assistant, powered by advanced AI models including XGBoost for churn prediction.
+
+🎯 **What I Can Do:**
+• **AI Churn Analysis**: Predict customer churn risk with machine learning
+• **Customer Insights**: Analyze individual customers with AI predictions
+• **Health Monitoring**: Track customer health scores and engagement
+• **Revenue Optimization**: Identify upselling and growth opportunities
+• **Retention Strategies**: AI-powered recommendations for customer retention
+
+💡 **Try These Commands:**
+• "Analyze customer CUST_0001" - Get AI insights for a specific customer
+• "What's our churn risk?" - AI-powered churn analysis
+• "Show health score analysis" - Customer health insights
+• "How can we increase revenue?" - Revenue optimization with AI
+• "What's our engagement status?" - Engagement analysis
+
+🔧 **AI Model Status:** {'✅ Active' if aura_ai_model.is_loaded else '❌ Not available'}"""
+        
+        # Default AI response
     else:
-        response = "I understand you're asking about customer retention. Could you be more specific about what aspect you'd like help with?"
+            response = f"""🤖 **A.U.R.A AI Assistant**
+
+I understand you're asking about customer retention. I'm powered by advanced AI models including XGBoost for churn prediction.
+
+💡 **I can help you with:**
+• AI-powered churn analysis and predictions
+• Customer health score monitoring
+• Revenue optimization strategies
+• Engagement pattern analysis
+• Personalized retention recommendations
+
+🔧 **AI Model Status:** {'✅ Active' if aura_ai_model.is_loaded else '❌ Not available'}
+
+**Try asking:**
+• "Analyze customer CUST_0001" for specific customer insights
+• "What's our churn risk?" for overall churn analysis
+• "Show health score analysis" for customer health insights"""
+    
+    except Exception as e:
+        logger.error(f"AI chatbot error: {e}")
+        response = f"❌ AI analysis error: {str(e)}. Please try again or contact support."
     
     history.append([message, response])
     return history, ""
