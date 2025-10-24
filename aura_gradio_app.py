@@ -656,7 +656,7 @@ def chat_with_aura(message, history):
                 response = "❌ No customer data loaded. Please load data first to get AI-powered churn analysis."
         
         # AI-powered health score analysis
-    elif "health" in message_lower or "score" in message_lower:
+        elif "health" in message_lower or "score" in message_lower:
             if data_loaded and not customer_data.empty:
                 avg_health = customer_data.get('current_health_score', pd.Series([0])).mean()
                 low_health_count = len(customer_data[customer_data.get('current_health_score', 100) < 50])
@@ -682,7 +682,7 @@ def chat_with_aura(message, history):
                 response = "❌ No customer data loaded. Please load data first to get AI-powered health analysis."
         
         # AI-powered revenue optimization
-    elif "revenue" in message_lower or "upsell" in message_lower:
+        elif "revenue" in message_lower or "upsell" in message_lower:
             if data_loaded and not customer_data.empty:
                 total_revenue = customer_data.get('total_lifetime_revenue', pd.Series([0])).sum()
                 high_value_count = len(customer_data[customer_data.get('current_health_score', 0) > 80])
@@ -709,7 +709,7 @@ def chat_with_aura(message, history):
                 response = "❌ No customer data loaded. Please load data first to get AI-powered revenue analysis."
         
         # AI-powered engagement analysis
-    elif "engagement" in message_lower:
+        elif "engagement" in message_lower:
             if data_loaded and not customer_data.empty:
                 avg_engagement = customer_data.get('engagement_score', pd.Series([0])).mean()
                 low_engagement_count = len(customer_data[customer_data.get('days_since_last_engagement', 0) > 30])
@@ -760,7 +760,7 @@ def chat_with_aura(message, history):
 • Revenue optimization: "How can we increase revenue?""""
         
         # Help and general information
-    elif "help" in message_lower or "what" in message_lower:
+        elif "help" in message_lower or "what" in message_lower:
             response = f"""🤖 **A.U.R.A AI Assistant - Powered by Machine Learning**
 
 I'm your intelligent customer retention assistant, powered by advanced AI models including XGBoost for churn prediction.
