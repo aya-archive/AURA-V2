@@ -1,3 +1,16 @@
+---
+title: AURA - Adaptive User Retention Assistant
+emoji: 🤖
+colorFrom: blue
+colorTo: teal
+sdk: gradio
+sdk_version: 4.0.0
+app_file: app.py
+pinned: false
+license: mit
+short_description: AI-powered customer retention analytics platform
+---
+
 # 🤖 A.U.R.A - Adaptive User Retention Assistant
 
 **Intelligent Customer Retention Analytics Platform**
